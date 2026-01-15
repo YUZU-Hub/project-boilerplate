@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(docker compose *)",
+      "Bash(php -S localhost:*)",
+      "Bash(curl http://localhost:*)",
+      "Bash(npm run *)",
+      "Bash(git *)"
+    ],
+    "deny": []
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "$schema": "https://raw.githubusercontent.com/anthropics/claude-code/main/mcp-schema.json",
+  "mcpServers": {
+    "pocketbase": {
+      "command": "npx",
+      "args": ["-y", "pocketbase-mcp"],
+      "env": {
+        "POCKETBASE_URL": "${POCKETBASE_URL:-http://localhost:8090}",
+        "POCKETBASE_ADMIN_EMAIL": "${POCKETBASE_ADMIN_EMAIL}",
+        "POCKETBASE_ADMIN_PASSWORD": "${POCKETBASE_ADMIN_PASSWORD}"
+      }
+    },
+    "coolify": {
+      "command": "npx",
+      "args": ["-y", "@coolify/mcp"],
+      "env": {
+        "COOLIFY_URL": "${COOLIFY_URL}",
+        "COOLIFY_TOKEN": "${COOLIFY_TOKEN}"
+      }
+    },
+    "ssh": {
+      "command": "npx",
+      "args": ["-y", "mcp-server-ssh"],
+      "env": {
+        "SSH_HOST": "${SHARED_HOST_SSH_HOST}",
+        "SSH_PORT": "${SHARED_HOST_SSH_PORT:-22}",
+        "SSH_USER": "${SHARED_HOST_SSH_USER}",
+        "SSH_PRIVATE_KEY_PATH": "${SHARED_HOST_SSH_KEY:-~/.ssh/id_rsa}"
+      }
+    },
+    "sftp": {
+      "command": "npx",
+      "args": ["-y", "mcp-server-sftp"],
+      "env": {
+        "SFTP_HOST": "${SHARED_HOST_SSH_HOST}",
+        "SFTP_PORT": "${SHARED_HOST_SSH_PORT:-22}",
+        "SFTP_USER": "${SHARED_HOST_SSH_USER}",
+        "SFTP_PRIVATE_KEY_PATH": "${SHARED_HOST_SSH_KEY:-~/.ssh/id_rsa}",
+        "SFTP_ROOT_PATH": "${SFTP_ROOT_PATH:-/}"
+      }
+    },
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@context7/mcp"]
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}"
+      }
+    },
+    "fetch": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-fetch"]
+    },
+    "memory": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"]
+    },
+    "docker": {
+      "command": "npx",
+      "args": ["-y", "mcp-server-docker"]
+    }
+  }
+}

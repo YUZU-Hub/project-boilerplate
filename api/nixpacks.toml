@@ -1,0 +1,11 @@
+# Coolify/Nixpacks configuration for PocketBase
+# This tells Coolify to use the Dockerfile instead of auto-detection
+
+[phases.build]
+cmds = []
+
+[phases.setup]
+nixPkgs = []
+
+[start]
+cmd = "/pb/pocketbase serve --http=0.0.0.0:8090"
