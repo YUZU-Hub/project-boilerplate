@@ -206,6 +206,8 @@ Migrations stored in `api/pb_migrations/`. Export from admin UI or create manual
 
 ## Notes
 
+PocketBase hooks run in isolated contexts - variables declared outside handlers aren't accessible inside them.
+
 [Add any project-specific notes, decisions, or gotchas here]
 
 ---
