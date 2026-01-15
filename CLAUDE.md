@@ -62,6 +62,20 @@ Project-specific variables:
 
 ## Claude Code Setup
 
+### Documentation Lookup
+
+**IMPORTANT:** Always use Context7 to check current documentation before implementing features, especially for:
+
+- **PocketBase** - API changed significantly between versions (v0.22+ has breaking changes)
+- **Any SDK or library** - Don't rely on training data, fetch current docs
+- **Deployment configs** - Coolify, Nixpacks, Docker configurations evolve
+
+Use the `context7` MCP to query docs:
+```
+"What's the current PocketBase JS SDK syntax for authentication?"
+"How do I create a record with relations in PocketBase 0.22?"
+```
+
 ### MCP Servers
 
 All MCPs use environment variables for credentials. No secrets in `.mcp.json`.
