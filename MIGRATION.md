@@ -24,17 +24,17 @@ These are additive changes that won't break anything.
 
 - [ ] **CLAUDE.md** - Copy and customize for your project
   ```bash
-  curl -o CLAUDE.md https://raw.githubusercontent.com/YOUR_USER/project-boilerplate/main/CLAUDE.md
+  curl -o CLAUDE.md https://raw.githubusercontent.com/YUZU-Hub/project-boilerplate/main/CLAUDE.md
   ```
 
 - [ ] **.editorconfig** - Consistent formatting
   ```bash
-  curl -o .editorconfig https://raw.githubusercontent.com/YOUR_USER/project-boilerplate/main/.editorconfig
+  curl -o .editorconfig https://raw.githubusercontent.com/YUZU-Hub/project-boilerplate/main/.editorconfig
   ```
 
 - [ ] **LICENSE** - If missing
   ```bash
-  curl -o LICENSE https://raw.githubusercontent.com/YOUR_USER/project-boilerplate/main/LICENSE
+  curl -o LICENSE https://raw.githubusercontent.com/YUZU-Hub/project-boilerplate/main/LICENSE
   ```
 
 ### Phase 2: Claude Code Integration (No Risk)
@@ -42,14 +42,14 @@ These are additive changes that won't break anything.
 - [ ] **.claude/** directory - Commands, agents, and settings
   ```bash
   mkdir -p .claude/commands .claude/agents
-  curl -o .claude/settings.json https://raw.githubusercontent.com/YOUR_USER/project-boilerplate/main/.claude/settings.json
-  curl -o .claude/commands/dev.md https://raw.githubusercontent.com/YOUR_USER/project-boilerplate/main/.claude/commands/dev.md
-  curl -o .claude/commands/stop.md https://raw.githubusercontent.com/YOUR_USER/project-boilerplate/main/.claude/commands/stop.md
-  curl -o .claude/commands/db-status.md https://raw.githubusercontent.com/YOUR_USER/project-boilerplate/main/.claude/commands/db-status.md
-  curl -o .claude/commands/deploy.md https://raw.githubusercontent.com/YOUR_USER/project-boilerplate/main/.claude/commands/deploy.md
-  curl -o .claude/commands/commit.md https://raw.githubusercontent.com/YOUR_USER/project-boilerplate/main/.claude/commands/commit.md
-  curl -o .claude/commands/migrate.md https://raw.githubusercontent.com/YOUR_USER/project-boilerplate/main/.claude/commands/migrate.md
-  curl -o .claude/agents/commit.md https://raw.githubusercontent.com/YOUR_USER/project-boilerplate/main/.claude/agents/commit.md
+  curl -o .claude/settings.json https://raw.githubusercontent.com/YUZU-Hub/project-boilerplate/main/.claude/settings.json
+  curl -o .claude/commands/dev.md https://raw.githubusercontent.com/YUZU-Hub/project-boilerplate/main/.claude/commands/dev.md
+  curl -o .claude/commands/stop.md https://raw.githubusercontent.com/YUZU-Hub/project-boilerplate/main/.claude/commands/stop.md
+  curl -o .claude/commands/db-status.md https://raw.githubusercontent.com/YUZU-Hub/project-boilerplate/main/.claude/commands/db-status.md
+  curl -o .claude/commands/deploy.md https://raw.githubusercontent.com/YUZU-Hub/project-boilerplate/main/.claude/commands/deploy.md
+  curl -o .claude/commands/commit.md https://raw.githubusercontent.com/YUZU-Hub/project-boilerplate/main/.claude/commands/commit.md
+  curl -o .claude/commands/migrate.md https://raw.githubusercontent.com/YUZU-Hub/project-boilerplate/main/.claude/commands/migrate.md
+  curl -o .claude/agents/commit.md https://raw.githubusercontent.com/YUZU-Hub/project-boilerplate/main/.claude/agents/commit.md
   ```
   Then customize commands for your project's paths/ports.
 
@@ -61,7 +61,7 @@ These are additive changes that won't break anything.
 
 - [ ] **.mcp.json** - MCP server configuration
   ```bash
-  curl -o .mcp.json https://raw.githubusercontent.com/YOUR_USER/project-boilerplate/main/.mcp.json
+  curl -o .mcp.json https://raw.githubusercontent.com/YUZU-Hub/project-boilerplate/main/.mcp.json
   ```
   Uses env vars, safe to commit. Adjust `SFTP_ROOT_PATH` default if needed.
 
@@ -70,19 +70,19 @@ These are additive changes that won't break anything.
 - [ ] **Update .gitignore** - Merge with boilerplate version
   ```bash
   # Review and merge manually - don't overwrite!
-  curl -o .gitignore.new https://raw.githubusercontent.com/YOUR_USER/project-boilerplate/main/.gitignore
+  curl -o .gitignore.new https://raw.githubusercontent.com/YUZU-Hub/project-boilerplate/main/.gitignore
   # Compare and merge:
   diff .gitignore .gitignore.new
   ```
 
 - [ ] **Add web/.gitignore** - If you have a web directory
   ```bash
-  curl -o web/.gitignore https://raw.githubusercontent.com/YOUR_USER/project-boilerplate/main/web/.gitignore
+  curl -o web/.gitignore https://raw.githubusercontent.com/YUZU-Hub/project-boilerplate/main/web/.gitignore
   ```
 
 - [ ] **Add api/.gitignore** - If you have an api directory
   ```bash
-  curl -o api/.gitignore https://raw.githubusercontent.com/YOUR_USER/project-boilerplate/main/api/.gitignore
+  curl -o api/.gitignore https://raw.githubusercontent.com/YUZU-Hub/project-boilerplate/main/api/.gitignore
   ```
 
 ### Phase 4: Environment Variables (Medium Risk)
