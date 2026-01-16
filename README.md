@@ -41,7 +41,7 @@ Run `/setup` in Claude Code after cloning to configure your project.
 ## Deployment
 
 - **Web:** Auto-deploys to shared hosting via GitHub Actions
-- **API:** Auto-deploys to Coolify on push
+- **API:** Auto-deploys to Coolify via Dockerfile (required for rolling updates)
 
 See [CLAUDE.md](CLAUDE.md) for full documentation.
 

@@ -144,7 +144,9 @@ Pre-configured permissions in `.claude/settings.json`:
 - **URL:** https://api.[domain.com]
 - **Deploy:** Automatic via Coolify on push to `main` (only when `api/` changes)
 - **Admin UI:** https://api.[domain.com]/_/
-- **Config:** `api/nixpacks.toml` for Coolify settings
+- **Config:** `api/Dockerfile` for Coolify deployment
+
+**IMPORTANT:** Always deploy PocketBase using Dockerfile (not Nixpacks). Only Dockerfile deployments support rolling updates with zero downtime.
 
 ## Local Development
 
@@ -204,9 +206,41 @@ Custom hooks in `api/pb_hooks/main.pb.js`:
 
 Migrations stored in `api/pb_migrations/`. Export from admin UI or create manually.
 
+### Reserved System Routes
+
+**NEVER overwrite these routes with custom hooks** - they are used by PocketBase internally:
+
+| Route | Purpose |
+|-------|---------|
+| `/_/*` | Admin dashboard UI |
+| `/api/health` | Health check endpoint |
+| `/api/settings` | Application settings |
+| `/api/backups/*` | Backup management |
+| `/api/collections/*` | Collection schema CRUD |
+| `/api/collections/{c}/records/*` | Record CRUD operations |
+| `/api/collections/{c}/auth-methods` | List auth methods |
+| `/api/collections/{c}/auth-with-password` | Password authentication |
+| `/api/collections/{c}/auth-with-oauth2` | OAuth2 authentication |
+| `/api/collections/{c}/auth-with-otp` | OTP authentication |
+| `/api/collections/{c}/auth-refresh` | Refresh auth token |
+| `/api/collections/{c}/request-verification` | Request email verification |
+| `/api/collections/{c}/confirm-verification` | Confirm email verification |
+| `/api/collections/{c}/request-password-reset` | Request password reset |
+| `/api/collections/{c}/confirm-password-reset` | Confirm password reset |
+| `/api/collections/{c}/request-email-change` | Request email change |
+| `/api/collections/{c}/confirm-email-change` | Confirm email change |
+| `/api/collections/{c}/impersonate` | Impersonate user (superuser) |
+| `/api/files/*` | File serving |
+| `/api/realtime` | SSE realtime subscriptions |
+| `/api/batch` | Batch API requests |
+
+**Safe pattern for custom routes:** Use `/api/custom/` or `/api/myapp/` prefix.
+
 ## Notes
 
 PocketBase hooks run in isolated contexts - variables declared outside handlers aren't accessible inside them.
+
+Only use PocketBase Authentication. Don't implement Auth yourself.
 
 [Add any project-specific notes, decisions, or gotchas here]
 
