@@ -187,15 +187,29 @@ docker compose up --build
 
 ## Deployment
 
-### Coolify Setup
+Deploy anywhere Docker runs: VPS, Coolify, Railway, Render, Fly.io, DigitalOcean, etc.
 
-1. Create new application in Coolify
-2. Connect to GitHub repository
-3. Build path: `/` (root Dockerfile)
-4. Configure domains for each port
-5. Set environment variables
+### Build & Deploy
 
-### Environment Variables (Coolify)
+```bash
+# Build production image
+docker build -t myapp .
+
+# Run (any Docker host)
+docker run -d --restart unless-stopped \
+  -p 3000:3000 -p 3001:3001 -p 3002:3002 -p 8090:8090 \
+  -v pb_data:/app/api/pb_data \
+  myapp
+```
+
+### PaaS Platforms (Coolify, Railway, Render, Fly.io)
+
+1. Connect your GitHub repository
+2. Point to the root `Dockerfile`
+3. Configure domains for each port
+4. Set environment variables
+
+### Environment Variables (Production)
 
 - `NODE_ENV=production`
 - `API_URL=https://api.yourdomain.com`
@@ -205,11 +219,9 @@ docker compose up --build
 
 ### Auto-Deploy
 
-Push to `main` branch triggers:
-1. GitHub Actions builds and tests Docker image
-2. Coolify detects changes and deploys
+Push to `main` branch triggers GitHub Actions to build and test.
 
-**IMPORTANT:** Always deploy using Dockerfile (not Nixpacks). Only Dockerfile deployments support rolling updates with zero downtime.
+**Note:** Always deploy using Dockerfile (not Nixpacks). Only Dockerfile deployments support rolling updates with zero downtime.
 
 ## Admin Dashboard
 

@@ -55,9 +55,11 @@ Choose ONE type based on the primary change:
 ## Step 4: Determine Scope
 
 Based on what area was changed:
-- `api` - Backend/PocketBase changes
-- `web` - Frontend/website changes
-- `mobile` - Mobile app changes
+- `homepage` - Landing/marketing pages
+- `webapp` - Web application
+- `admin` - Admin dashboard
+- `server` - Node.js Express servers
+- `api` - PocketBase hooks/config
 - `db` - Database/migrations
 - `auth` - Authentication
 - `ui` - UI components

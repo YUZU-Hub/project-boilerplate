@@ -16,4 +16,4 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 
 **Types:** `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`, `ci`
 
-**Scopes:** `api`, `web`, `mobile`, `db`, `auth`, `ui` (or omit)
+**Scopes:** `homepage`, `webapp`, `admin`, `server`, `api`, `db`, `auth`, `ui` (or omit)
