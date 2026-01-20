@@ -8,72 +8,101 @@
 
 ## Stack
 
-- **Web:** PHP/HTML (shared hosting)
-- **API:** PocketBase (self-hosted on Coolify)
-- **Mobile:** [iOS / Android / React Native] (if applicable)
+- **Frontend:** Static HTML/CSS/JS (Homepage, Webapp, Admin Dashboard)
+- **Backend:** Node.js Express + PocketBase
+- **Deployment:** Coolify (single Docker container)
 
 ## Directory Structure
 
 ```
-├── web/              → Static/PHP site, deployed to shared hosting
-├── api/              → PocketBase backend, deployed via Coolify
-├── mobile/           → Mobile app source code
-├── .github/          → GitHub Actions for deployment
-└── .claude/          → Claude Code configuration
-    ├── settings.json → Permissions and hooks
-    └── commands/     → Custom slash commands
+├── homepage/         → Landing/marketing pages (static HTML/CSS/JS)
+│   ├── css/
+│   ├── js/
+│   └── assets/images/
+├── webapp/           → Web application (authenticated experience)
+│   ├── css/
+│   └── js/
+├── admin/            → Admin dashboard (system monitoring)
+│   ├── css/
+│   ├── js/
+│   └── components/
+├── api/              → PocketBase configuration
+│   ├── pb_hooks/     → Custom PocketBase hooks
+│   └── pb_migrations/→ Database migrations
+├── server/           → Node.js Express servers
+├── Dockerfile        → Production container
+├── Dockerfile.dev    → Development container
+├── docker-compose.yml→ Local development
+├── entrypoint.sh     → Production process manager
+├── entrypoint.dev.sh → Development process manager
+└── .github/workflows/→ CI/CD
 ```
+
+## Architecture
+
+Single Docker container running:
+- **Homepage server (port 3000):** Static landing pages
+- **Webapp server (port 3001):** Authenticated web application
+- **Admin server (port 3002):** System monitoring dashboard
+- **PocketBase (port 8090):** API and data admin UI
+
+### Deployment Modes
+
+**Mode 1: Separate ports (default)** - Best for subdomains
+- `example.com` → port 3000 (homepage)
+- `app.example.com` → port 3001 (webapp)
+- `admin.example.com` → port 3002 (admin)
+- `api.example.com` → port 8090 (PocketBase)
+
+**Mode 2: Single port with paths** - Best for single domain
+- Set `WEBAPP_PORT=` and `ADMIN_PORT=` (empty)
+- `example.com/` → homepage
+- `example.com/app/` → webapp
+- `example.com/admin/` → admin dashboard
 
 ## Environment Variables
 
-This project uses a two-tier environment variable system:
-
 ### Shared Credentials (once per machine)
 
-Credentials used across ALL projects. Add these to your shell profile (`~/.zshrc` or `~/.bashrc`):
+Add to your shell profile (`~/.zshrc` or `~/.bashrc`):
 
 ```bash
 # See .env.shared.example for full list
 export GITHUB_PERSONAL_ACCESS_TOKEN="ghp_xxx"
 export COOLIFY_URL="https://coolify.your-server.com"
 export COOLIFY_TOKEN="xxx"
-export SHARED_HOST_SSH_HOST="www453.your-server.de"
-export SHARED_HOST_SSH_PORT="222"
-export SHARED_HOST_SSH_USER="username"
-export SHARED_HOST_SSH_KEY="~/.ssh/id_rsa"
 export POCKETBASE_ADMIN_EMAIL="admin@example.com"
 export POCKETBASE_ADMIN_PASSWORD="xxx"
 ```
 
 After adding, run `source ~/.zshrc` or restart your terminal.
 
-### Project-Specific Settings (per project)
+### Project Settings
 
-Settings unique to this project. Copy and configure:
-
+Copy and configure:
 ```bash
-cp web/.env.example web/.env
-cp api/.env.example api/.env
+cp .env.example .env
 ```
 
-Project-specific variables:
-- `API_URL` - Production API URL for this project
-- `SFTP_ROOT_PATH` - Deploy path for this project (overrides shared default)
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `NODE_ENV` | `development` | Environment mode |
+| `HOMEPAGE_PORT` | `3000` | Homepage server port |
+| `WEBAPP_PORT` | `3001` | Webapp port (empty = mount on homepage) |
+| `WEBAPP_PATH` | `/` | Webapp path when mounted |
+| `ADMIN_PORT` | `3002` | Admin port (empty = mount on homepage) |
+| `ADMIN_PATH` | `/admin` | Admin path when mounted |
+| `API_URL` | `http://localhost:8090` | PocketBase URL |
 
 ## Claude Code Setup
 
 ### Documentation Lookup
 
-**IMPORTANT:** Always use Context7 to check current documentation before implementing features, especially for:
+**IMPORTANT:** Always use Context7 to check current documentation before implementing features:
 
-- **PocketBase** - API changed significantly between versions (v0.22+ has breaking changes)
-- **Any SDK or library** - Don't rely on training data, fetch current docs
-- **Deployment configs** - Coolify, Nixpacks, Docker configurations evolve
-
-Use the `context7` MCP to query docs:
 ```
 "What's the current PocketBase JS SDK syntax for authentication?"
-"How do I create a record with relations in PocketBase 0.22?"
+"How do I create a record with relations in PocketBase 0.25?"
 ```
 
 ### MCP Servers
@@ -84,8 +113,6 @@ All MCPs use environment variables for credentials. No secrets in `.mcp.json`.
 |------------|---------|------------------|
 | `pocketbase` | Database operations | `POCKETBASE_*` env vars |
 | `coolify` | Deployment management | `COOLIFY_*` env vars |
-| `ssh` | Server commands | `SHARED_HOST_*` env vars |
-| `sftp` | File transfer | `SHARED_HOST_*` env vars |
 | `github` | Repo management | `GITHUB_*` env vars |
 | `context7` | Documentation lookup | None needed |
 | `fetch` | HTTP/API testing | None needed |
@@ -124,74 +151,72 @@ See `/commit` command for full details.
 
 Pre-configured permissions in `.claude/settings.json`:
 - Docker compose operations
-- Local PHP server
+- npm and node commands
 - Git operations
-- npm scripts
-
-## Deployment
-
-### Web (Shared Hosting)
-
-- **Host:** [e.g., Strato]
-- **URL:** https://[domain.com]
-- **Deploy:** Automatic via GitHub Actions on push to `main` (only when `web/` changes)
-- **Path on server:** [e.g., `/usr/home/xxx/public_html/domain.com/`]
-- **Backups:** Automatic, 7-day retention
-
-### API (PocketBase)
-
-- **Host:** Coolify on [server]
-- **URL:** https://api.[domain.com]
-- **Deploy:** Automatic via Coolify on push to `main` (only when `api/` changes)
-- **Admin UI:** https://api.[domain.com]/_/
-- **Config:** `api/Dockerfile` for Coolify deployment
-
-**IMPORTANT:** Always deploy PocketBase using Dockerfile (not Nixpacks). Only Dockerfile deployments support rolling updates with zero downtime.
+- curl for testing
 
 ## Local Development
 
 ### Quick Start
 
 ```bash
-# Start everything (use /dev command in Claude Code)
-cd api && docker compose up -d
-cd web && php -S localhost:8000
-```
-
-### API
-
-```bash
-cd api
 docker compose up --build
 ```
 
-- Admin UI: http://localhost:8090/_/
-- API: http://localhost:8090/api/
-- Health: http://localhost:8090/api/health
+### Available Services
 
-### Web
+| Service | URL |
+|---------|-----|
+| Homepage | http://localhost:3000 |
+| Web App | http://localhost:3001 |
+| Admin Dashboard | http://localhost:3002 |
+| PocketBase API | http://localhost:8090/api/ |
+| PocketBase Admin | http://localhost:8090/_/ |
 
-```bash
-cd web
-cp .env.example .env  # Configure API_URL
-php -S localhost:8000
-```
+### Hot Reload
 
-- Site: http://localhost:8000
+- **Static files:** Changes to `homepage/`, `webapp/`, `admin/` are immediate
+- **Server code:** Changes to `server/*.js` auto-restart via Node.js `--watch`
+- **PocketBase hooks:** Changes to `api/pb_hooks/` require container restart
 
-## GitHub Secrets & Variables
+## Deployment
 
-### Secrets (required)
+### Coolify Setup
 
-- `SSH_PRIVATE_KEY` - SSH key for shared hosting deployment
+1. Create new application in Coolify
+2. Connect to GitHub repository
+3. Build path: `/` (root Dockerfile)
+4. Configure domains for each port
+5. Set environment variables
 
-### Variables (required)
+### Environment Variables (Coolify)
 
-- `SSH_HOST` - [e.g., www453.your-server.de]
-- `SSH_PORT` - [e.g., 222]
-- `SSH_USER` - [e.g., username]
-- `DEPLOY_PATH` - [e.g., /usr/home/xxx/public_html/domain.com/]
-- `BACKUP_PATH` - [e.g., /usr/home/xxx/backups/domain.com]
+- `NODE_ENV=production`
+- `API_URL=https://api.yourdomain.com`
+- `HOMEPAGE_PORT=3000`
+- `WEBAPP_PORT=3001` (or empty for path-based)
+- `ADMIN_PORT=3002` (or empty for path-based)
+
+### Auto-Deploy
+
+Push to `main` branch triggers:
+1. GitHub Actions builds and tests Docker image
+2. Coolify detects changes and deploys
+
+**IMPORTANT:** Always deploy using Dockerfile (not Nixpacks). Only Dockerfile deployments support rolling updates with zero downtime.
+
+## Admin Dashboard
+
+The admin dashboard provides operational insights:
+
+| Feature | Description |
+|---------|-------------|
+| System Health | CPU, memory, uptime of container |
+| Service Status | Health of all servers |
+| Request Logs | Recent HTTP requests |
+| PocketBase Stats | Database size, health status |
+
+**Authentication:** Requires PocketBase admin credentials.
 
 ## PocketBase Notes
 
@@ -201,6 +226,8 @@ Custom hooks in `api/pb_hooks/main.pb.js`:
 - Custom routes
 - Database event handlers
 - Cron jobs
+
+**Note:** Hooks run in isolated contexts - variables declared outside handlers aren't accessible inside them.
 
 ### Migrations
 
@@ -237,8 +264,6 @@ Migrations stored in `api/pb_migrations/`. Export from admin UI or create manual
 **Safe pattern for custom routes:** Use `/api/custom/` or `/api/myapp/` prefix.
 
 ## Notes
-
-PocketBase hooks run in isolated contexts - variables declared outside handlers aren't accessible inside them.
 
 Only use PocketBase Authentication. Don't implement Auth yourself.
 

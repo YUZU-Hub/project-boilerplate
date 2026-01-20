@@ -12,41 +12,48 @@ Add to `~/.zshrc` or `~/.bashrc` (see `.env.shared.example`):
 export GITHUB_PERSONAL_ACCESS_TOKEN="ghp_xxx"
 export COOLIFY_URL="https://coolify.your-server.com"
 export COOLIFY_TOKEN="xxx"
-# ... see .env.shared.example for full list
+export POCKETBASE_ADMIN_EMAIL="admin@example.com"
+export POCKETBASE_ADMIN_PASSWORD="xxx"
 ```
 
 ### 2. Start Development
 
 ```bash
-# API (PocketBase)
-cd api && docker compose up --build
-
-# Web (in another terminal)
-cd web && cp .env.example .env && php -S localhost:8000
+docker compose up --build
 ```
 
-- Admin UI: http://localhost:8090/_/
-- Web: http://localhost:8000
+Available services:
+- Homepage: http://localhost:3000
+- Web App: http://localhost:3001
+- Admin Dashboard: http://localhost:3002
+- PocketBase API: http://localhost:8090
+- PocketBase Admin: http://localhost:8090/_/
 
 ## Claude Code Integration
 
 This boilerplate includes Claude Code configuration:
 
-- **MCP Servers:** PocketBase, Coolify, SSH, SFTP, Context7, GitHub, Fetch, Memory, Docker
+- **MCP Servers:** PocketBase, Coolify, Context7, GitHub, Fetch, Memory, Docker
 - **Custom Commands:** `/dev`, `/stop`, `/db-status`, `/setup`, `/deploy`, `/migrate`, `/commit`
-- **Environment:** Two-tier system - shared credentials in shell profile, project settings in `.env` files
+- **Environment:** Two-tier system - shared credentials in shell profile, project settings in `.env`
 
 Run `/setup` in Claude Code after cloning to configure your project.
 
+## Architecture
+
+Single Docker container running:
+- **Node.js Express** - Homepage (3000), Webapp (3001), Admin (3002)
+- **PocketBase** - API and database (8090)
+
 ## Deployment
 
-- **Web:** Auto-deploys to shared hosting via GitHub Actions
-- **API:** Auto-deploys to Coolify via Dockerfile (required for rolling updates)
+Auto-deploys to Coolify via root Dockerfile when changes are pushed to `main`.
 
 See [CLAUDE.md](CLAUDE.md) for full documentation.
 
 ## Stack
 
-- **Web:** PHP/HTML on shared hosting
-- **API:** PocketBase on Coolify
+- **Frontend:** Static HTML/CSS/JS
+- **Backend:** Node.js Express + PocketBase
+- **Deployment:** Coolify (Docker)
 - **CI/CD:** GitHub Actions

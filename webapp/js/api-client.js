@@ -2,21 +2,28 @@
  * PocketBase API Client Wrapper
  *
  * Usage:
- *   import { api } from './js/api-client.js';
  *   const items = await api.list('collection_name');
+ *   const user = await api.login('email@example.com', 'password');
  */
 
-// Configure your API URL
+// Configure your API URL - can be overridden via window.API_URL
 const API_URL = window.API_URL || 'http://localhost:8090';
 
-// Initialize PocketBase (requires SDK loaded via CDN or npm)
+// Initialize PocketBase (requires SDK loaded via CDN)
 const pb = new PocketBase(API_URL);
 
-export const api = {
+const api = {
     /**
      * Get PocketBase instance for direct access
      */
     client: pb,
+
+    /**
+     * Get API URL
+     */
+    getApiUrl() {
+        return API_URL;
+    },
 
     /**
      * Check API health
@@ -98,7 +105,21 @@ export const api = {
      * Get current user
      */
     currentUser() {
-        return pb.authStore.model;
+        return pb.authStore.record;
+    },
+
+    /**
+     * Get auth token
+     */
+    getToken() {
+        return pb.authStore.token;
+    },
+
+    /**
+     * Subscribe to auth state changes
+     */
+    onAuthChange(callback) {
+        return pb.authStore.onChange(callback);
     },
 
     /**
@@ -116,4 +137,5 @@ export const api = {
     }
 };
 
-export default api;
+// Make api available globally
+window.api = api;

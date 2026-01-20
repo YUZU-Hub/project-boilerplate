@@ -1,12 +1,19 @@
 # Stop Development Environment
 
-Stop all local development servers.
+Stop all local development services.
+
+## Stop All Services
 
 ```bash
-cd api && docker compose down
+docker compose down
 ```
 
-Note: PHP built-in server needs to be stopped manually (Ctrl+C) or:
+## Stop and Remove Volumes
+
+To stop and remove all data (use with caution):
+
 ```bash
-pkill -f "php -S localhost:8000" 2>/dev/null || true
+docker compose down -v
 ```
+
+Note: This will delete all PocketBase data stored in the `pb_data` volume.

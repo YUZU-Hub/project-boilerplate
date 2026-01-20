@@ -1,23 +1,37 @@
 # Start Development Environment
 
-Start both API and web servers for local development.
+Start all services (Node.js servers + PocketBase) in Docker for local development.
 
-## Start API (PocketBase)
-
-```bash
-cd api && docker compose up -d
-```
-
-Wait for it to be ready:
-```bash
-until curl -s http://localhost:8090/api/health > /dev/null 2>&1; do sleep 1; done
-echo "PocketBase is ready at http://localhost:8090/_/"
-```
-
-## Start Web Server
+## Start All Services
 
 ```bash
-cd web && php -S localhost:8000
+docker compose up --build -d
 ```
 
-Web available at http://localhost:8000
+Wait for services to be ready:
+```bash
+until curl -s http://localhost:3000/health > /dev/null 2>&1 && curl -s http://localhost:8090/api/health > /dev/null 2>&1; do sleep 1; done
+echo "All services are ready!"
+```
+
+## Available Services
+
+| Service | URL |
+|---------|-----|
+| Homepage | http://localhost:3000 |
+| Web App | http://localhost:3001 |
+| Admin Dashboard | http://localhost:3002 |
+| PocketBase API | http://localhost:8090 |
+| PocketBase Admin | http://localhost:8090/_/ |
+
+## View Logs
+
+```bash
+docker compose logs -f
+```
+
+## Hot Reload
+
+- **Static files**: Changes to `homepage/`, `webapp/`, `admin/` are immediate
+- **Server code**: Changes to `server/*.js` auto-restart via Node.js `--watch`
+- **PocketBase hooks**: Changes to `api/pb_hooks/` require container restart
