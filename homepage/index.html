@@ -34,7 +34,7 @@
             <h1>Build Modern Apps<br><span class="gradient-text">Without the Setup Pain</span></h1>
             <p class="hero-subtitle">
                 A production-ready boilerplate combining Node.js, PocketBase, and Docker
-                in a single container. Deploy to Coolify with zero configuration.
+                in a single container. Deploy anywhere Docker runs.
             </p>
             <div class="cta-buttons">
                 <a href="#quickstart" class="btn btn-primary btn-large">
@@ -51,7 +51,6 @@
                 <span class="tech-badge">Express</span>
                 <span class="tech-badge">PocketBase</span>
                 <span class="tech-badge">Docker</span>
-                <span class="tech-badge">Coolify</span>
             </div>
         </section>
 
@@ -120,8 +119,8 @@
                     <div class="feature-icon">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
                     </div>
-                    <h3>Coolify Ready</h3>
-                    <p>Designed for Coolify deployment with automatic SSL, domain routing, and zero-downtime updates.</p>
+                    <h3>Deploy Anywhere</h3>
+                    <p>Standard Dockerfile works with any host: VPS, Coolify, Railway, Render, Fly.io, or your own server.</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">
@@ -287,32 +286,32 @@ project/
         <!-- Deployment Section -->
         <section class="deployment">
             <div class="section-header">
-                <h2>Deploy to Production</h2>
-                <p>Push to main and let Coolify handle the rest</p>
+                <h2>Deploy Anywhere</h2>
+                <p>One Dockerfile, endless deployment options</p>
             </div>
             <div class="deploy-options">
-                <div class="deploy-card primary">
-                    <div class="deploy-icon">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                    </div>
-                    <h3>Coolify (Recommended)</h3>
-                    <p>Self-hosted PaaS with automatic SSL, rolling deploys, and built-in monitoring.</p>
-                    <ol>
-                        <li>Connect your GitHub repo to Coolify</li>
-                        <li>Point to the root <code>Dockerfile</code></li>
-                        <li>Configure domains for each port</li>
-                        <li>Push to deploy</li>
-                    </ol>
-                </div>
                 <div class="deploy-card">
                     <div class="deploy-icon">
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
                     </div>
                     <h3>Any Docker Host</h3>
-                    <p>Works on any server that runs Docker.</p>
+                    <p>VPS, dedicated server, or local machine - if it runs Docker, it runs this.</p>
                     <div class="code-block small">
                         <code>docker build -t myapp . && docker run -p 3000:3000 -p 3001:3001 -p 3002:3002 -p 8090:8090 myapp</code>
                     </div>
+                </div>
+                <div class="deploy-card">
+                    <div class="deploy-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    </div>
+                    <h3>PaaS Platforms</h3>
+                    <p>Coolify, Railway, Render, Fly.io - any platform that supports Dockerfile deployments.</p>
+                    <ol>
+                        <li>Connect your GitHub repo</li>
+                        <li>Point to the root <code>Dockerfile</code></li>
+                        <li>Configure domains for each port</li>
+                        <li>Push to deploy</li>
+                    </ol>
                 </div>
             </div>
         </section>

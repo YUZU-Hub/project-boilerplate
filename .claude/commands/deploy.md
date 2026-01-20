@@ -1,30 +1,40 @@
 # Manual Deployment
 
-This project deploys to Coolify automatically when changes are pushed to `main`.
+This project can be deployed anywhere Docker runs.
 
-## Check Deployment Status
+## Build & Test Locally
 
-### GitHub Actions
 ```bash
-gh run list --workflow=deploy.yml --limit=5
+# Build production image
+docker build -t myapp .
+
+# Test locally
+docker run -p 3000:3000 -p 3001:3001 -p 3002:3002 -p 8090:8090 myapp
 ```
 
-### Coolify
-Check your Coolify dashboard for deployment status and logs.
+## Deployment Options
 
-## Trigger Manual Deployment
+### Option 1: Any Docker Host (VPS, Dedicated Server)
 
-### Via GitHub Actions
 ```bash
-gh workflow run deploy.yml
+# On your server
+git pull
+docker build -t myapp .
+docker stop myapp || true
+docker run -d --name myapp --restart unless-stopped \
+  -p 3000:3000 -p 3001:3001 -p 3002:3002 -p 8090:8090 \
+  -v pb_data:/app/api/pb_data \
+  myapp
 ```
 
-### Via Coolify
-Use the Coolify MCP or dashboard to manually redeploy.
+### Option 2: PaaS Platforms (Coolify, Railway, Render, Fly.io)
 
-## Deployment Architecture
+1. Connect your GitHub repository
+2. Point to the root `Dockerfile`
+3. Configure domains for each port
+4. Push to deploy
 
-All services run in a single Docker container:
+## Service Ports
 
 | Service | Port | Domain Example |
 |---------|------|----------------|
@@ -33,11 +43,7 @@ All services run in a single Docker container:
 | Admin Dashboard | 3002 | admin.example.com |
 | PocketBase | 8090 | api.example.com |
 
-Configure domains and SSL in Coolify.
-
 ## Environment Variables
-
-Set these in Coolify:
 
 | Variable | Description |
 |----------|-------------|
@@ -46,3 +52,10 @@ Set these in Coolify:
 | `HOMEPAGE_PORT` | `3000` (default) |
 | `WEBAPP_PORT` | `3001` or empty for path-based |
 | `ADMIN_PORT` | `3002` or empty for path-based |
+
+## GitHub Actions
+
+Check deployment workflow status:
+```bash
+gh run list --workflow=deploy.yml --limit=5
+```

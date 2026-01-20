@@ -58,22 +58,28 @@ cd /app/server && node --watch index.js &
 NODE_PID=$!
 
 echo ""
-echo "Development servers started:"
-echo "  - Homepage:    http://localhost:${HOMEPAGE_PORT:-3000}"
+echo "========================================"
+echo "  Development servers started!"
+echo "========================================"
+echo ""
+echo "  Homepage:    http://localhost:${HOMEPAGE_PORT:-3000}"
 if [ -n "${WEBAPP_PORT}" ]; then
-    echo "  - Webapp:      http://localhost:${WEBAPP_PORT}"
+    echo "  Webapp:      http://localhost:${WEBAPP_PORT}"
 else
-    echo "  - Webapp:      http://localhost:${HOMEPAGE_PORT:-3000}${WEBAPP_PATH:-/}"
+    echo "  Webapp:      http://localhost:${HOMEPAGE_PORT:-3000}${WEBAPP_PATH:-/}"
 fi
 if [ -n "${ADMIN_PORT}" ]; then
-    echo "  - Admin:       http://localhost:${ADMIN_PORT}"
+    echo "  Admin:       http://localhost:${ADMIN_PORT}"
 else
-    echo "  - Admin:       http://localhost:${HOMEPAGE_PORT:-3000}${ADMIN_PATH:-/admin}"
+    echo "  Admin:       http://localhost:${HOMEPAGE_PORT:-3000}${ADMIN_PATH:-/admin}"
 fi
-echo "  - PocketBase:  http://localhost:8090"
-echo "  - PB Admin:    http://localhost:8090/_/"
+echo "  PocketBase:  http://localhost:8090"
+echo "  PB Admin:    http://localhost:8090/_/"
 echo ""
 echo "Hot-reload enabled - changes to server/*.js will auto-restart"
+echo ""
+echo "NOTE: First time? Check the logs above for the PocketBase"
+echo "      installer URL to create your admin account."
 echo ""
 
 # Wait for any process to exit

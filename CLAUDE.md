@@ -10,7 +10,7 @@
 
 - **Frontend:** Static HTML/CSS/JS (Homepage, Webapp, Admin Dashboard)
 - **Backend:** Node.js Express + PocketBase
-- **Deployment:** Coolify (single Docker container)
+- **Deployment:** Docker (works anywhere: VPS, Coolify, Railway, Render, Fly.io)
 
 ## Directory Structure
 
@@ -62,20 +62,26 @@ Single Docker container running:
 
 ## Environment Variables
 
-### Shared Credentials (once per machine)
+### MCP Server Credentials (once per machine)
 
-Add to your shell profile (`~/.zshrc` or `~/.bashrc`):
+These environment variables power Claude Code's MCP integrations. Add to your shell profile (`~/.zshrc` or `~/.bashrc`):
 
 ```bash
-# See .env.shared.example for full list
-export GITHUB_PERSONAL_ACCESS_TOKEN="ghp_xxx"
-export COOLIFY_URL="https://coolify.your-server.com"
-export COOLIFY_TOKEN="xxx"
+# REQUIRED for PocketBase MCP (database operations in Claude Code)
 export POCKETBASE_ADMIN_EMAIL="admin@example.com"
-export POCKETBASE_ADMIN_PASSWORD="xxx"
+export POCKETBASE_ADMIN_PASSWORD="your-password"
+
+# REQUIRED for GitHub MCP (repo management in Claude Code)
+export GITHUB_PERSONAL_ACCESS_TOKEN="ghp_xxx"  # https://github.com/settings/tokens
+
+# OPTIONAL - Only if using Coolify for deployment
+export COOLIFY_URL="https://coolify.your-server.com"
+export COOLIFY_TOKEN="xxx"  # Coolify → Settings → API Tokens
 ```
 
 After adding, run `source ~/.zshrc` or restart your terminal.
+
+**Note:** Without these variables, you'll see warnings when Claude Code starts. The MCP servers that use them won't work until configured.
 
 ### Project Settings
 

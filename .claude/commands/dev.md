@@ -5,16 +5,18 @@ Start all services (Node.js servers + PocketBase) in Docker for local developmen
 ## Start All Services
 
 ```bash
-docker compose up --build -d
+docker compose up --build -d && sleep 3 && docker compose logs --tail=20 && URL=$(docker compose logs 2>/dev/null | grep -o 'http://0.0.0.0:8090/_/#/pbinstal/[^[:space:]]*' | tail -1 | sed 's/0.0.0.0/localhost/') && [ -n "$URL" ] && echo "$URL" | pbcopy && echo "" && echo "✓ PocketBase installer URL copied to clipboard (Cmd+V to paste)" || true
 ```
 
-Wait for services to be ready:
+Starts services, shows logs, and copies the PocketBase installer URL to clipboard (only on first run).
+
+## View Logs
+
 ```bash
-until curl -s http://localhost:3000/health > /dev/null 2>&1 && curl -s http://localhost:8090/api/health > /dev/null 2>&1; do sleep 1; done
-echo "All services are ready!"
+docker compose logs -f
 ```
 
-## Available Services
+## Services
 
 | Service | URL |
 |---------|-----|
@@ -24,14 +26,8 @@ echo "All services are ready!"
 | PocketBase API | http://localhost:8090 |
 | PocketBase Admin | http://localhost:8090/_/ |
 
-## View Logs
-
-```bash
-docker compose logs -f
-```
-
 ## Hot Reload
 
-- **Static files**: Changes to `homepage/`, `webapp/`, `admin/` are immediate
-- **Server code**: Changes to `server/*.js` auto-restart via Node.js `--watch`
-- **PocketBase hooks**: Changes to `api/pb_hooks/` require container restart
+- **Static files**: Immediate
+- **Server code**: Auto-restart via `--watch`
+- **PocketBase hooks**: Requires container restart

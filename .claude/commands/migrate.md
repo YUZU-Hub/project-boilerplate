@@ -16,11 +16,8 @@ ls -la .github/workflows/ 2>/dev/null || echo "No workflows"
 
 ```bash
 [ -n "$GITHUB_PERSONAL_ACCESS_TOKEN" ] && echo "✓ GitHub token" || echo "✗ GitHub token missing"
-[ -n "$COOLIFY_URL" ] && echo "✓ Coolify URL" || echo "✗ Coolify URL missing"
-[ -n "$COOLIFY_TOKEN" ] && echo "✓ Coolify token" || echo "✗ Coolify token missing"
-[ -n "$SHARED_HOST_SSH_HOST" ] && echo "✓ SSH host" || echo "✗ SSH host missing"
-[ -n "$SHARED_HOST_SSH_USER" ] && echo "✓ SSH user" || echo "✗ SSH user missing"
 [ -n "$POCKETBASE_ADMIN_EMAIL" ] && echo "✓ PocketBase email" || echo "✗ PocketBase email missing"
+[ -n "$POCKETBASE_ADMIN_PASSWORD" ] && echo "✓ PocketBase password" || echo "✗ PocketBase password missing"
 ```
 
 If any show ✗, set them up in `~/.zshrc` first (see `.env.shared.example` in boilerplate).
@@ -32,9 +29,11 @@ Tell me which phase you want to work on:
 1. **Foundation** - CLAUDE.md, .editorconfig, LICENSE
 2. **Claude Code** - .claude/ directory, .mcp.json
 3. **Git Hygiene** - .gitignore updates
-4. **Environment** - Convert to two-tier env vars
-5. **API Structure** - Dockerfile, docker-compose, nixpacks
-6. **Web Structure** - api-client.js, index.php template
-7. **CI/CD** - GitHub Actions workflows
+4. **Environment** - Configure .env files
+5. **Docker Structure** - Dockerfile, docker-compose.yml, entrypoint.sh
+6. **Server Structure** - server/*.js Express servers
+7. **Frontend Structure** - homepage/, webapp/, admin/ directories
+8. **PocketBase** - api/pb_hooks, api/pb_migrations
+9. **CI/CD** - GitHub Actions workflows
 
 See `MIGRATION.md` for detailed checklist.
