@@ -42,7 +42,7 @@ claude "Create a todos collection with title, completed, and user fields"
 
 **What ships vs. what you create:**
 - **Ships:** Auth UI, example CRUD code in `webapp/js/app.js`, CSS styles
-- **You create:** The `todos` collection (via MCP or migration)
+- **You create:** The `todos` collection (via MCP or migration) - it is NOT created automatically
 - The example code shows "Getting Started" instructions until the collection exists
 
 ## Development Workflow
