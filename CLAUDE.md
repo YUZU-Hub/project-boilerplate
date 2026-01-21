@@ -27,24 +27,33 @@
 
 Single Node.js process running multiple Express apps on different ports. Memory-efficient design sharing V8 engine and runtime.
 
-## Development Workflow
+## Quick Start After Clone
 
-**Expected workflow:**
 ```bash
-git clone <repo> myproject
+# 1. Install and start (creates admin account automatically)
+curl -fsSL https://raw.githubusercontent.com/YUZU-Hub/project-boilerplate/main/install.sh | sh -s myproject
+
+# 2. Create the todos collection to activate the example app
 cd myproject
-cp .env.example .env
-docker compose up --build -d    # Start services first
-claude "Build a todo app with sharing"  # Then build with Claude
+claude "Create a todos collection with title, completed, and user fields"
+
+# 3. Visit http://localhost:3001 - register, login, and the todo app works!
 ```
 
-**Important:** Docker must be running before using PocketBase MCP to create collections. Changes to static files and server code hot-reload automatically.
+**What ships vs. what you create:**
+- **Ships:** Auth UI, example CRUD code in `webapp/js/app.js`, CSS styles
+- **You create:** The `todos` collection (via MCP or migration)
+- The example code shows "Getting Started" instructions until the collection exists
+
+## Development Workflow
 
 **When building features:**
 1. Create PocketBase collections via MCP (requires docker running)
 2. Add frontend code to `webapp/` (hot-reloads)
 3. Add hooks to `api/pb_hooks/` if needed (requires restart)
 4. Test at http://localhost:3001
+
+**Important:** Docker must be running before using PocketBase MCP to create collections.
 
 ## Ports
 
@@ -85,7 +94,6 @@ claude "Build a todo app with sharing"  # Then build with Claude
 | `pocketbase` | Database operations |
 | `context7` | Documentation lookup |
 | `github` | Repo management |
-| `fetch` | HTTP/API testing |
 
 ## Custom Commands
 
@@ -160,6 +168,22 @@ migrate((app) => {
 ```
 
 **Caution:** `saveNoValidate()` skips ALL validation. Ensure your schema is correct before using it. For simple cases, prefer the **PocketBase MCP** which handles this automatically.
+
+### Migration Tracking
+
+**Filename format:** `<unix_timestamp_seconds>_<name>.js` (e.g., `1737451234_create_todos.js`)
+
+**Auto-apply:** PocketBase automatically applies pending migrations on startup. No manual commands needed.
+
+**Checking status:** Migrations that have been applied are tracked in PocketBase's internal `_migrations` table. You can verify applied migrations:
+- Check PocketBase startup logs for "Applied migration: ..."
+- Query `SELECT * FROM _migrations` in PocketBase Admin SQL console
+- If a collection exists with correct schema, the migration ran successfully
+
+**Workflow:**
+1. Create migration file in `api/pb_migrations/`
+2. Restart PocketBase (or `docker compose restart pocketbase`)
+3. Migration applies automatically - check logs to confirm
 
 ### Hooks Runtime (GOJA)
 

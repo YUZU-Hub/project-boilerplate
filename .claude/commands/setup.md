@@ -4,19 +4,33 @@ Run this after cloning the boilerplate to configure a new project.
 
 ## 1. Start the Development Environment
 
+**Recommended:** Use the install script which handles everything:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/YUZU-Hub/project-boilerplate/main/install.sh | sh -s myproject
+```
+
+This will:
+- Clone the repo
+- Prompt for admin email/password
+- Create the PocketBase superuser
+- Optionally add MCP credentials to `~/.zshrc`
+- Start the development environment
+
+**Manual alternative:**
+
 ```bash
 cp .env.example .env
 docker compose up --build
+# Then visit http://localhost:8090/_/ to create admin account manually
 ```
 
-Visit http://localhost:8090/_/ to create your PocketBase admin account.
-
-## 2. Set Up MCP Credentials
+## 2. Set Up MCP Credentials (if not done by install script)
 
 Add to `~/.zshrc` (required for Claude Code MCP integrations):
 
 ```bash
-# PocketBase MCP - use the credentials you just created
+# PocketBase MCP
 export POCKETBASE_ADMIN_EMAIL="admin@example.com"
 export POCKETBASE_ADMIN_PASSWORD="your-password"
 
