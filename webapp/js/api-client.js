@@ -134,6 +134,14 @@ const api = {
      */
     unsubscribe(collection) {
         return pb.collection(collection).unsubscribe();
+    },
+
+    /**
+     * Safe filter builder - prevents injection attacks
+     * Usage: api.filter('user = {:userId}', { userId: api.currentUser().id })
+     */
+    filter(expression, params = {}) {
+        return pb.filter(expression, params);
     }
 };
 

@@ -162,7 +162,10 @@ migrate((app) => {
     fields: [
       { type: "text", name: "title", required: true },
       { type: "bool", name: "completed" },
-      { type: "relation", name: "user", collectionId: usersCollection.id, required: true }
+      { type: "relation", name: "user", collectionId: usersCollection.id, required: true },
+      // Always include autodate fields:
+      { type: "autodate", name: "created", onCreate: true, onUpdate: false },
+      { type: "autodate", name: "updated", onCreate: true, onUpdate: true }
     ]
   });
   app.saveNoValidate(collection);  // Bypasses rule validation
@@ -223,6 +226,24 @@ Hooks run in **GOJA** (Go-based JS interpreter), not Node.js.
 - Browser APIs (`window`, `document`)
 
 **Full reference:** https://pocketbase.io/jsvm/index.html
+
+### JS SDK Patterns (Frontend)
+
+**Safe filters:** Never use string interpolation for filters (injection risk). Use `api.filter()`:
+
+```javascript
+// BAD - injection risk
+filter: `user = "${userId}"`
+
+// GOOD - safe parameterized filter
+filter: api.filter('user = {:userId}', { userId: api.currentUser().id })
+```
+
+**Auto-cancellation:** PocketBase JS SDK auto-cancels duplicate requests with the same signature. To disable (e.g., for parallel requests):
+
+```javascript
+api.list('collection', 1, 20, { requestKey: null })
+```
 
 ## Hot Reload
 

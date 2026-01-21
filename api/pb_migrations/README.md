@@ -22,7 +22,10 @@ migrate((app) => {
         type: "base",
         fields: [
             { type: "text", name: "title", required: true },
-            { type: "bool", name: "active" }
+            { type: "bool", name: "active" },
+            // Always include autodate fields:
+            { type: "autodate", name: "created", onCreate: true, onUpdate: false },
+            { type: "autodate", name: "updated", onCreate: true, onUpdate: true }
         ]
     });
     app.save(collection);

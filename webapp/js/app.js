@@ -194,7 +194,7 @@ async function loadTodos() {
     try {
         const result = await api.list('todos', 1, 50, {
             sort: '-created',
-            filter: `user = "${api.currentUser().id}"`
+            filter: api.filter('user = {:userId}', { userId: api.currentUser().id })
         });
 
         container.innerHTML = `
