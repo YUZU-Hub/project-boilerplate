@@ -86,6 +86,8 @@ claude "Create a todos collection with title, completed, and user fields"
 - PocketBase Hooks (backend): `$app`, `$http`, event handlers
 - Express.js: routes, middleware (for Node.js server)
 
+**CDN links:** Always verify CDN URLs exist before adding them. Check the actual CDN (jsdelivr, unpkg, cdnjs) for the correct version and path. Don't guess URLs - they change between versions.
+
 **Updating PocketBase:** Version is set in `Dockerfile` (`POCKETBASE_VERSION`). Before updating:
 1. Check changelog for breaking changes
 2. Review existing hooks/migrations for incompatibilities
