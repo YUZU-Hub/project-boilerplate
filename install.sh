@@ -90,9 +90,21 @@ fi
 echo "→ Starting services (this may take a minute on first run)"
 docker compose up --build -d
 
-# Wait for services
+# Wait for services and extract PocketBase installer URL
 echo "→ Waiting for services to be ready..."
-sleep 5
+sleep 3
+
+# Try to extract the installer URL from logs (contains auth token)
+INSTALLER_URL=""
+for i in 1 2 3 4 5; do
+    INSTALLER_URL=$(docker compose logs 2>/dev/null | grep -o "http://[^[:space:]]*/_/?installer#[^[:space:]]*" | head -1)
+    if [ -n "$INSTALLER_URL" ]; then
+        # Replace internal port with external port
+        INSTALLER_URL=$(echo "$INSTALLER_URL" | sed "s|:8090|:$POCKETBASE_PORT|")
+        break
+    fi
+    sleep 2
+done
 
 echo ""
 echo "  ✓ Ready!"
@@ -101,9 +113,23 @@ echo "  Your app is running at:"
 echo "    Homepage:    http://localhost:$HOMEPAGE_PORT"
 echo "    Webapp:      http://localhost:$WEBAPP_PORT"
 echo "    Admin:       http://localhost:$ADMIN_PORT"
-echo "    PocketBase:  http://localhost:$POCKETBASE_PORT/_/"
 echo ""
 echo "  Next steps:"
-echo "    cd $PROJECT_NAME"
-echo "    claude \"Build a todo app with user auth\""
+echo ""
+echo "  1. Create PocketBase admin account:"
+if [ -n "$INSTALLER_URL" ]; then
+    echo "     $INSTALLER_URL"
+else
+    echo "     http://localhost:$POCKETBASE_PORT/_/"
+fi
+echo ""
+echo "  2. Configure MCP credentials (add to ~/.zshrc):"
+echo "     export POCKETBASE_ADMIN_EMAIL=\"your-email@example.com\""
+echo "     export POCKETBASE_ADMIN_PASSWORD=\"your-password\""
+echo ""
+echo "     Then run: source ~/.zshrc"
+echo ""
+echo "  3. Start building:"
+echo "     cd $PROJECT_NAME"
+echo "     claude \"Build a todo app with user auth\""
 echo ""

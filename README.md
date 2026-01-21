@@ -17,33 +17,40 @@ cp .env.example .env
 docker compose up --build -d
 ```
 
-Then open Claude Code and describe what you want:
-
-```
-claude "Build a todo list app with user authentication and sharing between users"
-```
-
-Changes hot-reload automatically. Your app is ready at:
+Your app is running at:
 - **Homepage:** http://localhost:3000
 - **Web App:** http://localhost:3001
 - **Admin:** http://localhost:3002
 - **PocketBase Admin:** http://localhost:8090/_/
 
-## MCP Credentials Setup
+## Setup (Required)
 
-For Claude Code to interact with PocketBase, first create an admin account at http://localhost:8090/_/ then add to `~/.zshrc`:
+**1. Create PocketBase admin account:**
+
+Open http://localhost:8090/_/ and create your admin user.
+
+**2. Configure MCP credentials** (add to `~/.zshrc`):
 
 ```bash
-# PocketBase MCP (database operations)
-export POCKETBASE_ADMIN_EMAIL="admin@example.com"
+# PocketBase MCP (required for Claude to manage your database)
+export POCKETBASE_ADMIN_EMAIL="your-email@example.com"
 export POCKETBASE_ADMIN_PASSWORD="your-password"
 
-# GitHub MCP (repo management)
+# GitHub MCP (optional, for repo management)
 # Create at: https://github.com/settings/tokens (scopes: repo, read:org)
 export GITHUB_PERSONAL_ACCESS_TOKEN="ghp_xxx"
 ```
 
 Then reload: `source ~/.zshrc`
+
+**3. Start building:**
+
+```bash
+cd myproject
+claude "Build a todo list app with user authentication and sharing between users"
+```
+
+Changes hot-reload automatically.
 
 ## Slash Commands
 
