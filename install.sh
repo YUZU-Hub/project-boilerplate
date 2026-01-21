@@ -107,9 +107,9 @@ echo ""
 printf "  Admin email: "
 read ADMIN_EMAIL < /dev/tty
 printf "  Admin password: "
-stty -echo 2>/dev/tty
+stty -echo < /dev/tty 2>/dev/null
 read ADMIN_PASSWORD < /dev/tty
-stty echo 2>/dev/tty
+stty echo < /dev/tty 2>/dev/null
 echo ""
 
 # Create the superuser
