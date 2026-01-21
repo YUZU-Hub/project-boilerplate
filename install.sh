@@ -114,8 +114,13 @@ echo ""
 
 # Create the superuser
 echo "→ Creating admin account..."
-if docker exec "$CONTAINER_NAME" /pb/pocketbase superuser upsert "$ADMIN_EMAIL" "$ADMIN_PASSWORD" --dir=/pb/pb_data 2>/dev/null; then
+SUPERUSER_OUTPUT=$(docker exec "$CONTAINER_NAME" /pb/pocketbase superuser upsert "$ADMIN_EMAIL" "$ADMIN_PASSWORD" --dir=/pb/pb_data 2>&1)
+if echo "$SUPERUSER_OUTPUT" | grep -q "Successfully"; then
     echo "  ✓ Admin account created"
+elif echo "$SUPERUSER_OUTPUT" | grep -q "Error"; then
+    echo "  ✗ Failed: $SUPERUSER_OUTPUT"
+    echo "  Please check your email/password and try again."
+    exit 1
 else
     echo "  ⚠ Could not create admin (may already exist)"
 fi
