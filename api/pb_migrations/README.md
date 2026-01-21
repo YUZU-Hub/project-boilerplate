@@ -21,8 +21,8 @@ migrate((app) => {
         name: "items",
         type: "base",
         fields: [
-            new TextField({ name: "title", required: true }),
-            new BoolField({ name: "active" })
+            { type: "text", name: "title", required: true },
+            { type: "bool", name: "active" }
         ]
     });
     app.save(collection);

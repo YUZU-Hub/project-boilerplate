@@ -156,9 +156,9 @@ migrate((app) => {
     updateRule: "@request.auth.id = user.id",
     deleteRule: "@request.auth.id = user.id",
     fields: [
-      new TextField({ name: "title", required: true }),
-      new BoolField({ name: "completed" }),
-      new RelationField({ name: "user", collectionId: usersCollection.id, required: true })
+      { type: "text", name: "title", required: true },
+      { type: "bool", name: "completed" },
+      { type: "relation", name: "user", collectionId: usersCollection.id, required: true }
     ]
   });
   app.saveNoValidate(collection);  // Bypasses rule validation
