@@ -2,10 +2,9 @@
   "mcpServers": {
     "pocketbase": {
       "command": "npx",
-      "args": ["-y", "pocketbase-mcp"],
+      "args": ["-y", "dotenv-cli", "-e", ".env", "--", "npx", "-y", "pocketbase-mcp"],
       "env": {
-        "POCKETBASE_API_URL": "http://localhost:8090",
-        "POCKETBASE_ADMIN_TOKEN": "${POCKETBASE_ADMIN_TOKEN}"
+        "POCKETBASE_API_URL": "http://localhost:8090"
       }
     },
     "context7": {
