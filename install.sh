@@ -160,7 +160,6 @@ if [ "$CONFIGURE_MCP" != "n" ] && [ "$CONFIGURE_MCP" != "N" ]; then
             echo "export POCKETBASE_ADMIN_TOKEN=\"$ADMIN_TOKEN\"" >> ~/.zshrc
             echo "  ✓ Added token to ~/.zshrc"
         fi
-        echo "  Run: source ~/.zshrc"
     else
         echo "  ⚠ No token available to save"
     fi
@@ -177,5 +176,6 @@ echo "    PocketBase:  http://localhost:$POCKETBASE_PORT/_/"
 echo ""
 echo "  Start building:"
 echo "    cd $PROJECT_NAME"
+echo "    source ~/.zshrc"
 echo "    claude \"Build a todo app with user auth\""
 echo ""
