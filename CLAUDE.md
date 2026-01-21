@@ -269,6 +269,7 @@ This example works with a "todos" collection. **Delete the example sections** (m
 ## Coding Guidelines
 
 - **NEVER create PocketBase superuser/admin accounts.** If you see "create superuser" in logs, tell the user: "PocketBase needs an admin account. Please create one at http://localhost:8090/_/ or re-run the install script." Do NOT run `pocketbase superuser` yourself.
+- **Design fresh for each project.** The boilerplate's auth UI and example code are starting points, not templates to copy. Think about what design, layout, and UX patterns best fit the specific project being built.
 - Only use PocketBase Authentication. Don't implement auth yourself.
 - Update this file when making significant changes to structure or architecture.
 
