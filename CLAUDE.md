@@ -101,6 +101,10 @@ claude "Create a todos collection with title, completed, and user fields"
 | `context7` | Documentation lookup |
 | `github` | Repo management |
 
+**PocketBase MCP usage:**
+- **Use for:** CRUD operations on records, status checks, reading schema info
+- **Never for:** Creating or modifying collections - always use migrations instead (they're version controlled and reproducible across environments)
+
 ## Custom Commands
 
 | Command | Description |
