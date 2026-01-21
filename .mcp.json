@@ -1,18 +1,16 @@
 {
-  "$schema": "https://raw.githubusercontent.com/anthropics/claude-code/main/mcp-schema.json",
   "mcpServers": {
     "pocketbase": {
       "command": "npx",
-      "args": ["-y", "pocketbase-mcp"],
+      "args": ["-y", "@fadlee/pocketbase-mcp", "--url=http://localhost:8090"],
       "env": {
-        "POCKETBASE_URL": "${POCKETBASE_URL:-http://localhost:8090}",
         "POCKETBASE_ADMIN_EMAIL": "${POCKETBASE_ADMIN_EMAIL}",
         "POCKETBASE_ADMIN_PASSWORD": "${POCKETBASE_ADMIN_PASSWORD}"
       }
     },
     "context7": {
       "command": "npx",
-      "args": ["-y", "@context7/mcp"]
+      "args": ["-y", "@upstash/context7-mcp"]
     },
     "github": {
       "command": "npx",
@@ -20,10 +18,6 @@
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}"
       }
-    },
-    "fetch": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-fetch"]
     }
   }
 }

@@ -202,6 +202,15 @@ Hooks run in **GOJA** (Go-based JS interpreter), not Node.js.
 - **Server code:** Changes to `server/*.js` auto-restart via Node.js `--watch`
 - **PocketBase hooks:** Changes to `api/pb_hooks/` require container restart
 
+## Webapp Starter Code
+
+The webapp includes example CRUD code in `webapp/js/app.js` demonstrating:
+- List, create, update, delete operations
+- Realtime subscriptions for live updates
+- User-owned data patterns
+
+This example works with a "todos" collection. **Delete the example sections** (marked with comments) when building your own app.
+
 ## Coding Guidelines
 
 - Only use PocketBase Authentication. Don't implement auth yourself.

@@ -267,3 +267,103 @@ body {
         padding: var(--spacing-lg);
     }
 }
+
+/* =============================================================================
+   EXAMPLE: Todo List Styles - Delete when building your own app
+   ============================================================================= */
+
+.todos-example {
+    background: var(--color-bg-card);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+}
+
+.todos-example h2 {
+    font-size: 1.5rem;
+    margin-bottom: var(--spacing-md);
+}
+
+.todo-form {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
+}
+
+.todo-form input {
+    flex: 1;
+    padding: var(--spacing-sm);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-size: 1rem;
+}
+
+.todo-form input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+.todo-form button {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.todo-form button:hover {
+    background: var(--color-primary-dark);
+}
+
+.todo-list {
+    list-style: none;
+}
+
+.todo-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.todo-item:last-child {
+    border-bottom: none;
+}
+
+.todo-item.completed .todo-title {
+    text-decoration: line-through;
+    color: var(--color-text-light);
+}
+
+.todo-toggle {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.todo-title {
+    flex: 1;
+}
+
+.todo-delete {
+    background: none;
+    border: none;
+    color: var(--color-error);
+    font-size: 1.25rem;
+    cursor: pointer;
+    padding: 0 var(--spacing-xs);
+    opacity: 0.5;
+}
+
+.todo-delete:hover {
+    opacity: 1;
+}
+
+.empty-state {
+    text-align: center;
+    color: var(--color-text-light);
+    padding: var(--spacing-lg);
+}
