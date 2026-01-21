@@ -1,8 +1,8 @@
 {
   "mcpServers": {
     "pocketbase": {
-      "command": "npx",
-      "args": ["-y", "dotenv-cli", "-e", ".env", "--", "npx", "-y", "pocketbase-mcp"],
+      "command": "./run-pocketbase-mcp.sh",
+      "args": [],
       "env": {
         "POCKETBASE_API_URL": "http://localhost:8090"
       }
