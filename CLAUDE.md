@@ -132,42 +132,34 @@ Types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`, `ci`
 
 ### Migrations with Field-Dependent Rules
 
-When creating collections with rules that reference fields (e.g., `@request.auth.id = user.id`), the rules can't be set during initial creation because the fields don't exist yet.
+When creating collections with rules that reference fields (e.g., `@request.auth.id = user.id`), PocketBase v0.23+ validates rules by default before fields are registered.
 
-**Use the PocketBase MCP** to create collections - it handles this automatically.
-
-If writing migrations manually, split into two operations:
+**Solution: Use `saveNoValidate()`** to bypass validation when rules reference the collection's own fields:
 
 ```javascript
-// 1. Create collection WITHOUT rules
 migrate((app) => {
+  const usersCollection = app.findCollectionByNameOrId("users");
   const collection = new Collection({
-    name: "posts",
+    name: "todos",
     type: "base",
+    listRule: "@request.auth.id = user.id",
+    viewRule: "@request.auth.id = user.id",
+    createRule: "@request.auth.id != ''",
+    updateRule: "@request.auth.id = user.id",
+    deleteRule: "@request.auth.id = user.id",
     fields: [
-      { name: "title", type: "text" },
-      { name: "user", type: "relation", options: { collectionId: "users" } }
+      new TextField({ name: "title", required: true }),
+      new BoolField({ name: "completed" }),
+      new RelationField({ name: "user", collectionId: usersCollection.id, required: true })
     ]
-    // NO rules here - fields don't exist yet
   });
-  app.save(collection);
+  app.saveNoValidate(collection);  // Bypasses rule validation
 }, (app) => {
-  app.delete(app.findCollectionByNameOrId("posts"));
-});
-
-// 2. Add rules in a SEPARATE migration (runs after fields exist)
-migrate((app) => {
-  const collection = app.findCollectionByNameOrId("posts");
-  collection.viewRule = "@request.auth.id != ''";
-  collection.updateRule = "@request.auth.id = user.id";
-  app.save(collection);
-}, (app) => {
-  const collection = app.findCollectionByNameOrId("posts");
-  collection.viewRule = null;
-  collection.updateRule = null;
-  app.save(collection);
+  app.delete(app.findCollectionByNameOrId("todos"));
 });
 ```
+
+**Caution:** `saveNoValidate()` skips ALL validation. Ensure your schema is correct before using it. For simple cases, prefer the **PocketBase MCP** which handles this automatically.
 
 ### Hooks Runtime (GOJA)
 
