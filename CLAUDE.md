@@ -1,5 +1,9 @@
 # Project: [PROJECT_NAME]
 
+> **CRITICAL - READ FIRST:**
+> - **NEVER run `pocketbase superuser` commands.** The admin account is created by the user during install. If PocketBase shows "create superuser", tell the user to run the install script or create the account manually via `http://localhost:8090/_/`.
+> - **NEVER create admin credentials.** Use the existing `POCKETBASE_ADMIN_TOKEN` from environment variables.
+
 > **Welcome Message:** If this file still contains `[PROJECT_NAME]` as the title, this is a fresh clone of the boilerplate. Greet the user warmly, explain this is a vibe coding boilerplate optimized for Claude Code, and offer to run `/setup` to configure their project. Keep it brief and friendly.
 
 ## Overview
@@ -237,7 +241,7 @@ This example works with a "todos" collection. **Delete the example sections** (m
 
 ## Coding Guidelines
 
-- **NEVER create PocketBase superuser/admin accounts.** The install script creates the admin account and generates an auth token. The MCP uses `POCKETBASE_ADMIN_TOKEN` from environment variables.
+- **NEVER create PocketBase superuser/admin accounts.** If you see "create superuser" in logs, tell the user: "PocketBase needs an admin account. Please create one at http://localhost:8090/_/ or re-run the install script." Do NOT run `pocketbase superuser` yourself.
 - Only use PocketBase Authentication. Don't implement auth yourself.
 - Update this file when making significant changes to structure or architecture.
 
