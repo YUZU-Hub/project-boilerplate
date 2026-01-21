@@ -135,34 +135,17 @@ else
     ADMIN_TOKEN=""
 fi
 
-# Offer to configure MCP credentials
-echo ""
-printf "→ Add token to ~/.zshrc for Claude Code MCP? [Y/n] "
-read CONFIGURE_MCP < /dev/tty
-if [ "$CONFIGURE_MCP" != "n" ] && [ "$CONFIGURE_MCP" != "N" ]; then
-    if [ -n "$ADMIN_TOKEN" ]; then
-        # Check if already configured
-        if grep -q "POCKETBASE_ADMIN_TOKEN" ~/.zshrc 2>/dev/null; then
-            # Update existing
-            sed -i.bak "s|^export POCKETBASE_ADMIN_TOKEN=.*|export POCKETBASE_ADMIN_TOKEN=\"$ADMIN_TOKEN\"|" ~/.zshrc
-            rm -f ~/.zshrc.bak
-            echo "  ✓ Updated existing token in ~/.zshrc"
-        else
-            # Remove old email/password if present
-            if grep -q "POCKETBASE_ADMIN_EMAIL\|POCKETBASE_ADMIN_PASSWORD" ~/.zshrc 2>/dev/null; then
-                sed -i.bak '/POCKETBASE_ADMIN_EMAIL/d' ~/.zshrc
-                sed -i.bak '/POCKETBASE_ADMIN_PASSWORD/d' ~/.zshrc
-                rm -f ~/.zshrc.bak
-            fi
-            # Add new token
-            echo "" >> ~/.zshrc
-            echo "# PocketBase MCP token" >> ~/.zshrc
-            echo "export POCKETBASE_ADMIN_TOKEN=\"$ADMIN_TOKEN\"" >> ~/.zshrc
-            echo "  ✓ Added token to ~/.zshrc"
-        fi
+# Save token to project .env (Claude Code auto-loads .env files)
+if [ -n "$ADMIN_TOKEN" ]; then
+    if grep -q "POCKETBASE_ADMIN_TOKEN" .env 2>/dev/null; then
+        sed -i.bak "s|^POCKETBASE_ADMIN_TOKEN=.*|POCKETBASE_ADMIN_TOKEN=\"$ADMIN_TOKEN\"|" .env
+        rm -f .env.bak
     else
-        echo "  ⚠ No token available to save"
+        echo "" >> .env
+        echo "# PocketBase MCP token (Claude Code auto-loads this)" >> .env
+        echo "POCKETBASE_ADMIN_TOKEN=\"$ADMIN_TOKEN\"" >> .env
     fi
+    echo "  ✓ Token saved to .env"
 fi
 
 echo ""
@@ -176,6 +159,5 @@ echo "    PocketBase:  http://localhost:$POCKETBASE_PORT/_/"
 echo ""
 echo "  Start building:"
 echo "    cd $PROJECT_NAME"
-echo "    source ~/.zshrc"
 echo "    claude \"Build a todo app with user auth\""
 echo ""
