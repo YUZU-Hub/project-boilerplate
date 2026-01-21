@@ -23,16 +23,30 @@ if ! command -v docker >/dev/null 2>&1; then
     exit 1
 fi
 
-# Clone
-echo "→ Creating project: $PROJECT_NAME"
-git clone --depth 1 "$REPO_URL" "$PROJECT_NAME"
-cd "$PROJECT_NAME"
-rm -rf .git
-git init
+# Clone or resume existing
+if [ -d "$PROJECT_NAME" ]; then
+    if [ -f "$PROJECT_NAME/docker-compose.yml" ]; then
+        echo "→ Found existing project: $PROJECT_NAME"
+        echo "  Resuming setup (to start fresh, delete the directory first)"
+        cd "$PROJECT_NAME"
+    else
+        echo "Error: Directory '$PROJECT_NAME' exists but doesn't look like a project."
+        echo "  Delete it or choose a different name."
+        exit 1
+    fi
+else
+    echo "→ Creating project: $PROJECT_NAME"
+    git clone --depth 1 "$REPO_URL" "$PROJECT_NAME"
+    cd "$PROJECT_NAME"
+    rm -rf .git
+    git init
+fi
 
 # Setup
 echo "→ Setting up environment"
-cp .env.example .env
+if [ ! -f .env ]; then
+    cp .env.example .env
+fi
 
 # Check for port conflicts and auto-set PORT_OFFSET if needed
 check_port() {
