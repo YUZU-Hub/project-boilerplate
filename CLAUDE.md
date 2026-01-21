@@ -237,6 +237,7 @@ This example works with a "todos" collection. **Delete the example sections** (m
 
 ## Coding Guidelines
 
+- **NEVER create PocketBase superuser/admin accounts.** The install script creates the admin account with user-provided credentials. Use the existing credentials from `POCKETBASE_ADMIN_EMAIL` and `POCKETBASE_ADMIN_PASSWORD` environment variables.
 - Only use PocketBase Authentication. Don't implement auth yourself.
 - Update this file when making significant changes to structure or architecture.
 
