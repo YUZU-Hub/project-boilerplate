@@ -6,12 +6,12 @@ A boilerplate optimized for **vibe coding** with Claude Code. Pre-configured MCP
 
 **One-liner:**
 ```bash
-curl -fsSL https://raw.githubusercontent.com/your-org/boilerplate/main/install.sh | sh -s myproject
+curl -fsSL https://raw.githubusercontent.com/YUZU-Hub/project-boilerplate/main/install.sh | sh -s myproject
 ```
 
 **Or manually:**
 ```bash
-git clone https://github.com/your-org/your-project.git myproject
+git clone https://github.com/YUZU-Hub/project-boilerplate.git myproject
 cd myproject
 cp .env.example .env
 docker compose up --build -d

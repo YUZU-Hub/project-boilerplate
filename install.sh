@@ -4,7 +4,7 @@ set -e
 # Vibe Coding Boilerplate Installer
 # Usage: curl -fsSL https://raw.githubusercontent.com/your-org/boilerplate/main/install.sh | sh -s myproject
 
-REPO_URL="https://github.com/your-org/project-boilerplate.git"
+REPO_URL="https://github.com/YUZU-Hub/project-boilerplate.git"
 PROJECT_NAME="${1:-myproject}"
 
 echo ""
