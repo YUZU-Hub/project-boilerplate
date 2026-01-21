@@ -120,27 +120,50 @@ else
     echo "  ⚠ Could not create admin (may already exist)"
 fi
 
+# Generate auth token via API
+echo "→ Generating auth token..."
+AUTH_RESPONSE=$(curl -s -X POST "http://localhost:$POCKETBASE_PORT/api/collections/_superusers/auth-with-password" \
+    -H "Content-Type: application/json" \
+    -d "{\"identity\":\"$ADMIN_EMAIL\",\"password\":\"$ADMIN_PASSWORD\"}" 2>/dev/null)
+
+ADMIN_TOKEN=$(echo "$AUTH_RESPONSE" | grep -o '"token":"[^"]*"' | cut -d'"' -f4)
+
+if [ -n "$ADMIN_TOKEN" ]; then
+    echo "  ✓ Auth token generated"
+else
+    echo "  ⚠ Could not generate token (check credentials)"
+    ADMIN_TOKEN=""
+fi
+
 # Offer to configure MCP credentials
 echo ""
-printf "→ Add credentials to ~/.zshrc for Claude Code MCP? [Y/n] "
+printf "→ Add token to ~/.zshrc for Claude Code MCP? [Y/n] "
 read CONFIGURE_MCP < /dev/tty
 if [ "$CONFIGURE_MCP" != "n" ] && [ "$CONFIGURE_MCP" != "N" ]; then
-    # Check if already configured
-    if grep -q "POCKETBASE_ADMIN_EMAIL" ~/.zshrc 2>/dev/null; then
-        # Update existing
-        sed -i.bak "s|^export POCKETBASE_ADMIN_EMAIL=.*|export POCKETBASE_ADMIN_EMAIL=\"$ADMIN_EMAIL\"|" ~/.zshrc
-        sed -i.bak "s|^export POCKETBASE_ADMIN_PASSWORD=.*|export POCKETBASE_ADMIN_PASSWORD=\"$ADMIN_PASSWORD\"|" ~/.zshrc
-        rm -f ~/.zshrc.bak
-        echo "  ✓ Updated existing credentials in ~/.zshrc"
+    if [ -n "$ADMIN_TOKEN" ]; then
+        # Check if already configured
+        if grep -q "POCKETBASE_ADMIN_TOKEN" ~/.zshrc 2>/dev/null; then
+            # Update existing
+            sed -i.bak "s|^export POCKETBASE_ADMIN_TOKEN=.*|export POCKETBASE_ADMIN_TOKEN=\"$ADMIN_TOKEN\"|" ~/.zshrc
+            rm -f ~/.zshrc.bak
+            echo "  ✓ Updated existing token in ~/.zshrc"
+        else
+            # Remove old email/password if present
+            if grep -q "POCKETBASE_ADMIN_EMAIL\|POCKETBASE_ADMIN_PASSWORD" ~/.zshrc 2>/dev/null; then
+                sed -i.bak '/POCKETBASE_ADMIN_EMAIL/d' ~/.zshrc
+                sed -i.bak '/POCKETBASE_ADMIN_PASSWORD/d' ~/.zshrc
+                rm -f ~/.zshrc.bak
+            fi
+            # Add new token
+            echo "" >> ~/.zshrc
+            echo "# PocketBase MCP token" >> ~/.zshrc
+            echo "export POCKETBASE_ADMIN_TOKEN=\"$ADMIN_TOKEN\"" >> ~/.zshrc
+            echo "  ✓ Added token to ~/.zshrc"
+        fi
+        echo "  Run: source ~/.zshrc"
     else
-        # Add new
-        echo "" >> ~/.zshrc
-        echo "# PocketBase MCP credentials" >> ~/.zshrc
-        echo "export POCKETBASE_ADMIN_EMAIL=\"$ADMIN_EMAIL\"" >> ~/.zshrc
-        echo "export POCKETBASE_ADMIN_PASSWORD=\"$ADMIN_PASSWORD\"" >> ~/.zshrc
-        echo "  ✓ Added credentials to ~/.zshrc"
+        echo "  ⚠ No token available to save"
     fi
-    echo "  Run: source ~/.zshrc"
 fi
 
 echo ""

@@ -2,10 +2,10 @@
   "mcpServers": {
     "pocketbase": {
       "command": "npx",
-      "args": ["-y", "@fadlee/pocketbase-mcp", "--url=http://localhost:8090"],
+      "args": ["-y", "pocketbase-mcp"],
       "env": {
-        "POCKETBASE_ADMIN_EMAIL": "${POCKETBASE_ADMIN_EMAIL}",
-        "POCKETBASE_ADMIN_PASSWORD": "${POCKETBASE_ADMIN_PASSWORD}"
+        "POCKETBASE_API_URL": "http://localhost:8090",
+        "POCKETBASE_ADMIN_TOKEN": "${POCKETBASE_ADMIN_TOKEN}"
       }
     },
     "context7": {
