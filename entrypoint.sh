@@ -94,8 +94,8 @@ if [ -n "${ADMIN_PORT}" ]; then
 else
     echo "  Admin:       http://localhost:${HOMEPAGE_PORT:-3000}${ADMIN_PATH:-/admin}"
 fi
-echo "  PocketBase:  http://localhost:8090"
-echo "  PB Admin:    http://localhost:8090/_/"
+echo "  PocketBase:  http://localhost:${POCKETBASE_PORT:-8090}"
+echo "  PB Admin:    http://localhost:${POCKETBASE_PORT:-8090}/_/"
 echo ""
 
 if [ "$IS_DEV" = true ]; then

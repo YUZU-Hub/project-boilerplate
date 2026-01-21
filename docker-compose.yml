@@ -6,10 +6,11 @@ services:
       args:
         - NODE_ENV=${NODE_ENV:-development}
     ports:
-      - "${HOMEPAGE_PORT:-3000}:${HOMEPAGE_PORT:-3000}"
-      - "${WEBAPP_PORT:-3001}:${WEBAPP_PORT:-3001}"
-      - "${ADMIN_PORT:-3002}:${ADMIN_PORT:-3002}"
-      - "8090:8090"
+      # External:Internal - external ports configurable, internal fixed
+      - "${HOMEPAGE_PORT:-3000}:3000"
+      - "${WEBAPP_PORT:-3001}:3001"
+      - "${ADMIN_PORT:-3002}:3002"
+      - "${POCKETBASE_PORT:-8090}:8090"
     volumes:
       # Static files (hot-reload)
       - ./homepage:/app/homepage
@@ -31,10 +32,11 @@ services:
       - WEBAPP_PATH=${WEBAPP_PATH:-/}
       - ADMIN_PORT=${ADMIN_PORT:-3002}
       - ADMIN_PATH=${ADMIN_PATH:-/admin}
+      - POCKETBASE_PORT=${POCKETBASE_PORT:-8090}
       - API_URL=${API_URL:-http://localhost:8090}
     restart: unless-stopped
     healthcheck:
-      test: wget -q --spider http://localhost:${HOMEPAGE_PORT:-3000}/health && wget -q --spider http://localhost:8090/api/health || exit 1
+      test: wget -q --spider http://localhost:3000/health && wget -q --spider http://localhost:8090/api/health || exit 1
       interval: 30s
       timeout: 5s
       retries: 3

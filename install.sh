@@ -34,6 +34,58 @@ git init
 echo "→ Setting up environment"
 cp .env.example .env
 
+# Check for port conflicts and auto-set PORT_OFFSET if needed
+check_port() {
+    if command -v lsof >/dev/null 2>&1; then
+        lsof -i:"$1" >/dev/null 2>&1 && return 1
+    elif command -v nc >/dev/null 2>&1; then
+        nc -z localhost "$1" >/dev/null 2>&1 && return 1
+    fi
+    return 0
+}
+
+find_free_offset() {
+    for offset in 0 1000 2000 3000 4000 5000; do
+        all_free=true
+        for port in 3000 3001 3002 8090; do
+            test_port=$((port + offset))
+            if ! check_port "$test_port"; then
+                all_free=false
+                break
+            fi
+        done
+        if [ "$all_free" = true ]; then
+            echo "$offset"
+            return 0
+        fi
+    done
+    echo "0"  # Default, let Docker fail with a clear message
+}
+
+# Check default ports
+echo "→ Checking for port conflicts..."
+PORT_OFFSET=$(find_free_offset)
+if [ "$PORT_OFFSET" != "0" ]; then
+    echo "  Port conflict detected, using offset: $PORT_OFFSET"
+    # Update ports in .env
+    sed -i.bak "s/HOMEPAGE_PORT=3000/HOMEPAGE_PORT=$((3000 + PORT_OFFSET))/" .env
+    sed -i.bak "s/WEBAPP_PORT=3001/WEBAPP_PORT=$((3001 + PORT_OFFSET))/" .env
+    sed -i.bak "s/ADMIN_PORT=3002/ADMIN_PORT=$((3002 + PORT_OFFSET))/" .env
+    sed -i.bak "s/POCKETBASE_PORT=8090/POCKETBASE_PORT=$((8090 + PORT_OFFSET))/" .env
+    sed -i.bak "s|API_URL=http://localhost:8090|API_URL=http://localhost:$((8090 + PORT_OFFSET))|" .env
+    rm -f .env.bak
+
+    HOMEPAGE_PORT=$((3000 + PORT_OFFSET))
+    WEBAPP_PORT=$((3001 + PORT_OFFSET))
+    ADMIN_PORT=$((3002 + PORT_OFFSET))
+    POCKETBASE_PORT=$((8090 + PORT_OFFSET))
+else
+    HOMEPAGE_PORT=3000
+    WEBAPP_PORT=3001
+    ADMIN_PORT=3002
+    POCKETBASE_PORT=8090
+fi
+
 # Start
 echo "→ Starting services (this may take a minute on first run)"
 docker compose up --build -d
@@ -46,10 +98,10 @@ echo ""
 echo "  ✓ Ready!"
 echo ""
 echo "  Your app is running at:"
-echo "    Homepage:    http://localhost:3000"
-echo "    Webapp:      http://localhost:3001"
-echo "    Admin:       http://localhost:3002"
-echo "    PocketBase:  http://localhost:8090/_/"
+echo "    Homepage:    http://localhost:$HOMEPAGE_PORT"
+echo "    Webapp:      http://localhost:$WEBAPP_PORT"
+echo "    Admin:       http://localhost:$ADMIN_PORT"
+echo "    PocketBase:  http://localhost:$POCKETBASE_PORT/_/"
 echo ""
 echo "  Next steps:"
 echo "    cd $PROJECT_NAME"
