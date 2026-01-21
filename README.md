@@ -17,40 +17,33 @@ cp .env.example .env
 docker compose up --build -d
 ```
 
-Your app is running at:
-- **Homepage:** http://localhost:3000
-- **Web App:** http://localhost:3001
-- **Admin:** http://localhost:3002
-- **PocketBase Admin:** http://localhost:8090/_/
+The installer will prompt you for:
+1. **Admin email** - for PocketBase admin account
+2. **Admin password** - for PocketBase admin account
+3. **Configure MCP?** - optionally adds credentials to `~/.zshrc`
 
-## Setup (Required)
-
-**1. Create PocketBase admin account:**
-
-Open http://localhost:8090/_/ and create your admin user.
-
-**2. Configure MCP credentials** (add to `~/.zshrc`):
-
-```bash
-# PocketBase MCP (required for Claude to manage your database)
-export POCKETBASE_ADMIN_EMAIL="your-email@example.com"
-export POCKETBASE_ADMIN_PASSWORD="your-password"
-
-# GitHub MCP (optional, for repo management)
-# Create at: https://github.com/settings/tokens (scopes: repo, read:org)
-export GITHUB_PERSONAL_ACCESS_TOKEN="ghp_xxx"
-```
-
-Then reload: `source ~/.zshrc`
-
-**3. Start building:**
-
+Then start building:
 ```bash
 cd myproject
 claude "Build a todo list app with user authentication and sharing between users"
 ```
 
+Your app runs at:
+- **Homepage:** http://localhost:3000
+- **Web App:** http://localhost:3001
+- **Admin:** http://localhost:3002
+- **PocketBase Admin:** http://localhost:8090/_/
+
 Changes hot-reload automatically.
+
+## GitHub MCP (Optional)
+
+For Claude to manage your GitHub repo, add to `~/.zshrc`:
+```bash
+# Create at: https://github.com/settings/tokens (scopes: repo, read:org)
+export GITHUB_PERSONAL_ACCESS_TOKEN="ghp_xxx"
+```
+Then: `source ~/.zshrc`
 
 ## Slash Commands
 

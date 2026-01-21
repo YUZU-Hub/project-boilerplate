@@ -90,21 +90,58 @@ fi
 echo "→ Starting services (this may take a minute on first run)"
 docker compose up --build -d
 
-# Wait for services and extract PocketBase installer URL
-echo "→ Waiting for services to be ready..."
-sleep 3
-
-# Try to extract the installer URL from logs (contains auth token)
-INSTALLER_URL=""
-for i in 1 2 3 4 5; do
-    INSTALLER_URL=$(docker compose logs 2>/dev/null | grep -o "http://[^[:space:]]*/_/?installer#[^[:space:]]*" | head -1)
-    if [ -n "$INSTALLER_URL" ]; then
-        # Replace internal port with external port
-        INSTALLER_URL=$(echo "$INSTALLER_URL" | sed "s|:8090|:$POCKETBASE_PORT|")
+# Wait for PocketBase to be healthy
+echo "→ Waiting for PocketBase to be ready..."
+CONTAINER_NAME="${PROJECT_NAME}-app-1"
+for i in 1 2 3 4 5 6 7 8 9 10; do
+    if docker exec "$CONTAINER_NAME" wget -q --spider http://localhost:8090/api/health 2>/dev/null; then
         break
     fi
     sleep 2
 done
+
+# Prompt for admin credentials (read from /dev/tty for curl pipe compatibility)
+echo ""
+echo "→ Setting up PocketBase admin account"
+echo ""
+printf "  Admin email: "
+read ADMIN_EMAIL < /dev/tty
+printf "  Admin password: "
+stty -echo 2>/dev/tty
+read ADMIN_PASSWORD < /dev/tty
+stty echo 2>/dev/tty
+echo ""
+
+# Create the superuser
+echo "→ Creating admin account..."
+if docker exec "$CONTAINER_NAME" /pb/pocketbase superuser upsert "$ADMIN_EMAIL" "$ADMIN_PASSWORD" --dir=/pb/pb_data 2>/dev/null; then
+    echo "  ✓ Admin account created"
+else
+    echo "  ⚠ Could not create admin (may already exist)"
+fi
+
+# Offer to configure MCP credentials
+echo ""
+printf "→ Add credentials to ~/.zshrc for Claude Code MCP? [Y/n] "
+read CONFIGURE_MCP < /dev/tty
+if [ "$CONFIGURE_MCP" != "n" ] && [ "$CONFIGURE_MCP" != "N" ]; then
+    # Check if already configured
+    if grep -q "POCKETBASE_ADMIN_EMAIL" ~/.zshrc 2>/dev/null; then
+        # Update existing
+        sed -i.bak "s|^export POCKETBASE_ADMIN_EMAIL=.*|export POCKETBASE_ADMIN_EMAIL=\"$ADMIN_EMAIL\"|" ~/.zshrc
+        sed -i.bak "s|^export POCKETBASE_ADMIN_PASSWORD=.*|export POCKETBASE_ADMIN_PASSWORD=\"$ADMIN_PASSWORD\"|" ~/.zshrc
+        rm -f ~/.zshrc.bak
+        echo "  ✓ Updated existing credentials in ~/.zshrc"
+    else
+        # Add new
+        echo "" >> ~/.zshrc
+        echo "# PocketBase MCP credentials" >> ~/.zshrc
+        echo "export POCKETBASE_ADMIN_EMAIL=\"$ADMIN_EMAIL\"" >> ~/.zshrc
+        echo "export POCKETBASE_ADMIN_PASSWORD=\"$ADMIN_PASSWORD\"" >> ~/.zshrc
+        echo "  ✓ Added credentials to ~/.zshrc"
+    fi
+    echo "  Run: source ~/.zshrc"
+fi
 
 echo ""
 echo "  ✓ Ready!"
@@ -113,23 +150,9 @@ echo "  Your app is running at:"
 echo "    Homepage:    http://localhost:$HOMEPAGE_PORT"
 echo "    Webapp:      http://localhost:$WEBAPP_PORT"
 echo "    Admin:       http://localhost:$ADMIN_PORT"
+echo "    PocketBase:  http://localhost:$POCKETBASE_PORT/_/"
 echo ""
-echo "  Next steps:"
-echo ""
-echo "  1. Create PocketBase admin account:"
-if [ -n "$INSTALLER_URL" ]; then
-    echo "     $INSTALLER_URL"
-else
-    echo "     http://localhost:$POCKETBASE_PORT/_/"
-fi
-echo ""
-echo "  2. Configure MCP credentials (add to ~/.zshrc):"
-echo "     export POCKETBASE_ADMIN_EMAIL=\"your-email@example.com\""
-echo "     export POCKETBASE_ADMIN_PASSWORD=\"your-password\""
-echo ""
-echo "     Then run: source ~/.zshrc"
-echo ""
-echo "  3. Start building:"
-echo "     cd $PROJECT_NAME"
-echo "     claude \"Build a todo app with user auth\""
+echo "  Start building:"
+echo "    cd $PROJECT_NAME"
+echo "    claude \"Build a todo app with user auth\""
 echo ""
