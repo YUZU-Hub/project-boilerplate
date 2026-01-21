@@ -17,6 +17,10 @@
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}"
       }
+    },
+    "stellarmcp": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://stellarmcp.com/mcp"]
     }
   }
 }
