@@ -2,27 +2,19 @@
 
 Run this after cloning the boilerplate to configure a new project.
 
-## 1. Start the Development Environment
+## 1. Check Development Environment
 
-**Recommended:** Use the install script which handles everything:
+If you used the install script, your containers are already running. Verify with:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/YUZU-Hub/project-boilerplate/main/install.sh | sh -s myproject
+docker compose ps
 ```
 
-This will:
-- Clone the repo
-- Prompt for admin email/password
-- Create the PocketBase superuser
-- Optionally add MCP credentials to `~/.zshrc`
-- Start the development environment
-
-**Manual alternative:**
+**If not running**, start with:
 
 ```bash
 cp .env.example .env
 docker compose up --build
-# Then visit http://localhost:8090/_/ to create admin account manually
 ```
 
 ## 2. Set Up MCP Credentials (if not done by install script)
