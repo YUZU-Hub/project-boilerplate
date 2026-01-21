@@ -1,8 +1,9 @@
 #!/bin/sh
 set -e
 
-# Production entrypoint script
-# Starts PocketBase and Node.js servers, handles graceful shutdown
+# Unified entrypoint script
+# Starts PocketBase and Node.js servers
+# In development mode (NODE_ENV=development), enables --watch for hot-reload
 
 # Store PIDs for cleanup
 POCKETBASE_PID=""
@@ -30,8 +31,18 @@ cleanup() {
 
 trap cleanup SIGTERM SIGINT
 
+# Determine if we're in development mode
+IS_DEV=false
+if [ "${NODE_ENV}" = "development" ]; then
+    IS_DEV=true
+fi
+
 # Start PocketBase in background
-echo "Starting PocketBase..."
+if [ "$IS_DEV" = true ]; then
+    echo "Starting PocketBase (development mode)..."
+else
+    echo "Starting PocketBase..."
+fi
 /pb/pocketbase serve --http=0.0.0.0:8090 --dir=/pb/pb_data --hooksDir=/pb/pb_hooks --migrationsDir=/pb/pb_migrations &
 POCKETBASE_PID=$!
 
@@ -52,27 +63,48 @@ done
 
 echo "PocketBase is ready!"
 
-# Start Node.js servers
-echo "Starting Node.js servers..."
-cd /app/server && node index.js &
+# Start Node.js servers (with --watch in development mode)
+if [ "$IS_DEV" = true ]; then
+    echo "Starting Node.js servers (watch mode for hot-reload)..."
+    cd /app/server && node --watch index.js &
+else
+    echo "Starting Node.js servers..."
+    cd /app/server && node index.js &
+fi
 NODE_PID=$!
 
+# Print service URLs
 echo ""
-echo "All services started:"
-echo "  - Homepage:    http://localhost:${HOMEPAGE_PORT:-3000}"
-if [ -n "${WEBAPP_PORT}" ]; then
-    echo "  - Webapp:      http://localhost:${WEBAPP_PORT}"
+if [ "$IS_DEV" = true ]; then
+    echo "========================================"
+    echo "  Development servers started!"
+    echo "========================================"
 else
-    echo "  - Webapp:      http://localhost:${HOMEPAGE_PORT:-3000}${WEBAPP_PATH:-/}"
+    echo "All services started:"
+fi
+echo ""
+echo "  Homepage:    http://localhost:${HOMEPAGE_PORT:-3000}"
+if [ -n "${WEBAPP_PORT}" ]; then
+    echo "  Webapp:      http://localhost:${WEBAPP_PORT}"
+else
+    echo "  Webapp:      http://localhost:${HOMEPAGE_PORT:-3000}${WEBAPP_PATH:-/}"
 fi
 if [ -n "${ADMIN_PORT}" ]; then
-    echo "  - Admin:       http://localhost:${ADMIN_PORT}"
+    echo "  Admin:       http://localhost:${ADMIN_PORT}"
 else
-    echo "  - Admin:       http://localhost:${HOMEPAGE_PORT:-3000}${ADMIN_PATH:-/admin}"
+    echo "  Admin:       http://localhost:${HOMEPAGE_PORT:-3000}${ADMIN_PATH:-/admin}"
 fi
-echo "  - PocketBase:  http://localhost:8090"
-echo "  - PB Admin:    http://localhost:8090/_/"
+echo "  PocketBase:  http://localhost:8090"
+echo "  PB Admin:    http://localhost:8090/_/"
 echo ""
+
+if [ "$IS_DEV" = true ]; then
+    echo "Hot-reload enabled - changes to server/*.js will auto-restart"
+    echo ""
+    echo "NOTE: First time? Check the logs above for the PocketBase"
+    echo "      installer URL to create your admin account."
+    echo ""
+fi
 
 # Wait for any process to exit
 wait -n $POCKETBASE_PID $NODE_PID

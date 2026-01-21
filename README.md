@@ -1,66 +1,56 @@
 # Vibe Coding Boilerplate
 
-A boilerplate optimized for **vibe coding** with Claude Code. Pre-configured MCP servers, slash commands, and a clean architecture that AI understands. Just describe what you want to build.
-
-## Why This Exists
-
-Vibe coding works best when the AI understands your project structure. This boilerplate provides:
-
-- **MCP Servers** - Claude Code can directly interact with your database, GitHub, and deployment
-- **Slash Commands** - `/dev`, `/stop`, `/deploy`, `/commit` work out of the box
-- **Clean Architecture** - Separation that AI can reason about easily
-- **CLAUDE.md** - Project context that helps Claude understand your codebase
+A boilerplate optimized for **vibe coding** with Claude Code. Pre-configured MCP servers, slash commands, and a clean architecture that AI understands.
 
 ## Quick Start
 
-### 1. Clone and Start
-
+**One-liner:**
 ```bash
-git clone https://github.com/your-org/your-project.git
-cd your-project
-docker compose up --build
+curl -fsSL https://raw.githubusercontent.com/your-org/boilerplate/main/install.sh | sh -s myproject
 ```
 
-Services will be available at:
-- Homepage: http://localhost:3000
-- Web App: http://localhost:3001
-- Admin Dashboard: http://localhost:3002
-- PocketBase API: http://localhost:8090
-- PocketBase Admin: http://localhost:8090/_/
+**Or manually:**
+```bash
+git clone https://github.com/your-org/your-project.git myproject
+cd myproject
+cp .env.example .env
+docker compose up --build -d
+```
 
-### 2. Set Up MCP Credentials
+Then open Claude Code and describe what you want:
 
-For Claude Code to interact with your services, add to `~/.zshrc`:
+```
+claude "Build a todo list app with user authentication and sharing between users"
+```
+
+Changes hot-reload automatically. Your app is ready at:
+- **Homepage:** http://localhost:3000
+- **Web App:** http://localhost:3001
+- **Admin:** http://localhost:3002
+- **PocketBase Admin:** http://localhost:8090/_/
+
+## MCP Credentials Setup
+
+For Claude Code to interact with PocketBase, first create an admin account at http://localhost:8090/_/ then add to `~/.zshrc`:
 
 ```bash
-# Required for PocketBase MCP (database operations)
+# PocketBase MCP (database operations)
 export POCKETBASE_ADMIN_EMAIL="admin@example.com"
-export POCKETBASE_ADMIN_PASSWORD="xxx"
+export POCKETBASE_ADMIN_PASSWORD="your-password"
 
-# Required for GitHub MCP (repo management)
+# GitHub MCP (repo management)
+# Create at: https://github.com/settings/tokens (scopes: repo, read:org)
 export GITHUB_PERSONAL_ACCESS_TOKEN="ghp_xxx"
-
-# Optional - only if using Coolify for deployment
-export COOLIFY_URL="https://coolify.your-server.com"
-export COOLIFY_TOKEN="xxx"
 ```
 
-Then run `source ~/.zshrc`.
+Then reload: `source ~/.zshrc`
 
-### 3. Start Vibe Coding
+## Slash Commands
 
-Open the project in Claude Code and try:
-
-```
-"Add a user registration form to the webapp"
-"Create a PocketBase collection for blog posts"
-"Deploy this to production"
-```
-
-Or use slash commands:
 - `/dev` - Start development environment
 - `/stop` - Stop all services
 - `/db-status` - Check PocketBase health
+- `/setup` - Initial project configuration
 - `/deploy` - Deployment guide
 - `/commit` - Create a formatted commit
 
@@ -72,7 +62,7 @@ Single Docker container running:
 
 ```
 project/
-├── homepage/     → Landing pages (static)
+├── homepage/     → Landing pages (static HTML/CSS/JS)
 ├── webapp/       → Web application
 ├── admin/        → Admin dashboard
 ├── server/       → Node.js Express servers
@@ -80,16 +70,51 @@ project/
 └── .claude/      → Claude Code configuration
 ```
 
+### Deployment Modes
+
+**Mode 1: Separate ports (default)** - Best for subdomains
+```
+example.com       → port 3000 (homepage)
+app.example.com   → port 3001 (webapp)
+admin.example.com → port 3002 (admin)
+api.example.com   → port 8090 (PocketBase)
+```
+
+**Mode 2: Single port with paths** - Best for single domain
+Set `WEBAPP_PORT=` and `ADMIN_PORT=` to empty in `.env`:
+```
+example.com/       → homepage
+example.com/app/   → webapp
+example.com/admin/ → admin dashboard
+```
+
 ## Deployment
 
 Deploy anywhere Docker runs:
 
 ```bash
+# Build production image
 docker build -t myapp .
-docker run -p 3000:3000 -p 3001:3001 -p 3002:3002 -p 8090:8090 myapp
+
+# Run (any Docker host)
+docker run -d --restart unless-stopped \
+  -p 3000:3000 -p 3001:3001 -p 3002:3002 -p 8090:8090 \
+  -v pb_data:/app/api/pb_data \
+  -e NODE_ENV=production \
+  myapp
 ```
 
 Works with Coolify, Railway, Render, Fly.io, DigitalOcean, or any Docker host.
+
+### Production Environment Variables
+
+```bash
+NODE_ENV=production
+API_URL=https://api.yourdomain.com
+HOMEPAGE_PORT=3000
+WEBAPP_PORT=3001   # or empty for path-based
+ADMIN_PORT=3002    # or empty for path-based
+```
 
 ## Stack
 
@@ -98,4 +123,4 @@ Works with Coolify, Railway, Render, Fly.io, DigitalOcean, or any Docker host.
 - **Backend:** Node.js Express + PocketBase
 - **Deployment:** Docker (any platform)
 
-See [CLAUDE.md](CLAUDE.md) for full documentation.
+See [CLAUDE.md](CLAUDE.md) for AI-specific instructions.

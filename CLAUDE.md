@@ -1,145 +1,105 @@
 # Project: [PROJECT_NAME]
 
-> **Note to Claude:** Update this file whenever you make significant changes to the project structure, deployment configuration, or technical decisions. Especially after initial setup, replace placeholder values and document any project-specific details.
+> **Welcome Message:** If this file still contains `[PROJECT_NAME]` as the title, this is a fresh clone of the boilerplate. Greet the user warmly, explain this is a vibe coding boilerplate optimized for Claude Code, and offer to run `/setup` to configure their project. Keep it brief and friendly.
 
 ## Overview
 
 [Brief description of what this project does]
 
-## Stack
-
-- **Frontend:** Static HTML/CSS/JS (Homepage, Webapp, Admin Dashboard)
-- **Backend:** Node.js Express + PocketBase
-- **Deployment:** Docker (works anywhere: VPS, Coolify, Railway, Render, Fly.io)
-
 ## Directory Structure
 
 ```
 ├── homepage/         → Landing/marketing pages (static HTML/CSS/JS)
-│   ├── css/
-│   ├── js/
-│   └── assets/images/
 ├── webapp/           → Web application (authenticated experience)
-│   ├── css/
-│   └── js/
 ├── admin/            → Admin dashboard (system monitoring)
-│   ├── css/
-│   ├── js/
-│   └── components/
 ├── api/              → PocketBase configuration
 │   ├── pb_hooks/     → Custom PocketBase hooks
 │   └── pb_migrations/→ Database migrations
-├── server/           → Node.js Express servers
-├── Dockerfile        → Production container
-├── Dockerfile.dev    → Development container
+├── server/
+│   └── index.js      → Single unified Express server (all 3 apps)
+├── Dockerfile        → Unified container (dev + prod)
 ├── docker-compose.yml→ Local development
-├── entrypoint.sh     → Production process manager
-├── entrypoint.dev.sh → Development process manager
-└── .github/workflows/→ CI/CD
+├── entrypoint.sh     → Process manager (dev + prod)
+└── .claude/          → Claude Code configuration
 ```
 
 ## Architecture
 
-Single Docker container running:
-- **Homepage server (port 3000):** Static landing pages
-- **Webapp server (port 3001):** Authenticated web application
-- **Admin server (port 3002):** System monitoring dashboard
-- **PocketBase (port 8090):** API and data admin UI
+Single Node.js process running multiple Express apps on different ports. Memory-efficient design sharing V8 engine and runtime.
 
-### Deployment Modes
+## Development Workflow
 
-**Mode 1: Separate ports (default)** - Best for subdomains
-- `example.com` → port 3000 (homepage)
-- `app.example.com` → port 3001 (webapp)
-- `admin.example.com` → port 3002 (admin)
-- `api.example.com` → port 8090 (PocketBase)
-
-**Mode 2: Single port with paths** - Best for single domain
-- Set `WEBAPP_PORT=` and `ADMIN_PORT=` (empty)
-- `example.com/` → homepage
-- `example.com/app/` → webapp
-- `example.com/admin/` → admin dashboard
-
-## Environment Variables
-
-### MCP Server Credentials (once per machine)
-
-These environment variables power Claude Code's MCP integrations. Add to your shell profile (`~/.zshrc` or `~/.bashrc`):
-
+**Expected workflow:**
 ```bash
-# REQUIRED for PocketBase MCP (database operations in Claude Code)
-export POCKETBASE_ADMIN_EMAIL="admin@example.com"
-export POCKETBASE_ADMIN_PASSWORD="your-password"
-
-# REQUIRED for GitHub MCP (repo management in Claude Code)
-export GITHUB_PERSONAL_ACCESS_TOKEN="ghp_xxx"  # https://github.com/settings/tokens
-
-# OPTIONAL - Only if using Coolify for deployment
-export COOLIFY_URL="https://coolify.your-server.com"
-export COOLIFY_TOKEN="xxx"  # Coolify → Settings → API Tokens
-```
-
-After adding, run `source ~/.zshrc` or restart your terminal.
-
-**Note:** Without these variables, you'll see warnings when Claude Code starts. The MCP servers that use them won't work until configured.
-
-### Project Settings
-
-Copy and configure:
-```bash
+git clone <repo> myproject
+cd myproject
 cp .env.example .env
+docker compose up --build -d    # Start services first
+claude "Build a todo app with sharing"  # Then build with Claude
 ```
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `NODE_ENV` | `development` | Environment mode |
-| `HOMEPAGE_PORT` | `3000` | Homepage server port |
-| `WEBAPP_PORT` | `3001` | Webapp port (empty = mount on homepage) |
-| `WEBAPP_PATH` | `/` | Webapp path when mounted |
-| `ADMIN_PORT` | `3002` | Admin port (empty = mount on homepage) |
-| `ADMIN_PATH` | `/admin` | Admin path when mounted |
-| `API_URL` | `http://localhost:8090` | PocketBase URL |
+**Important:** Docker must be running before using PocketBase MCP to create collections. Changes to static files and server code hot-reload automatically.
 
-## Claude Code Setup
+**When building features:**
+1. Create PocketBase collections via MCP (requires docker running)
+2. Add frontend code to `webapp/` (hot-reloads)
+3. Add hooks to `api/pb_hooks/` if needed (requires restart)
+4. Test at http://localhost:3001
 
-### Documentation Lookup
+## Ports
 
-**IMPORTANT:** Always use Context7 to check current documentation before implementing features:
+| Service | Port | URL |
+|---------|------|-----|
+| Homepage | 3000 | http://localhost:3000 |
+| Webapp | 3001 | http://localhost:3001 |
+| Admin | 3002 | http://localhost:3002 |
+| PocketBase | 8090 | http://localhost:8090 |
+| PocketBase Admin | 8090 | http://localhost:8090/_/ |
+
+## Documentation Lookup
+
+**CRITICAL:** Before writing ANY PocketBase code, ALWAYS:
+1. Check the current stable version via Context7
+2. Verify the correct syntax for that version
+3. PocketBase APIs change between versions - don't assume
 
 ```
-"What's the current PocketBase JS SDK syntax for authentication?"
-"How do I create a record with relations in PocketBase 0.25?"
+"What is the current stable PocketBase JS SDK version and authentication syntax?"
+"Show me the current PocketBase realtime subscription syntax"
 ```
 
-### MCP Servers
+**Key docs to check:**
+- PocketBase JS SDK (frontend): authentication, CRUD, realtime, files
+- PocketBase Hooks (backend): `$app`, `$http`, event handlers
+- Express.js: routes, middleware (for Node.js server)
 
-All MCPs use environment variables for credentials. No secrets in `.mcp.json`.
+**Updating PocketBase:** Version is set in `Dockerfile` (`POCKETBASE_VERSION`). Before updating:
+1. Check changelog for breaking changes
+2. Review existing hooks/migrations for incompatibilities
+3. Test locally before deploying
 
-| MCP Server | Purpose | Credentials From |
-|------------|---------|------------------|
-| `pocketbase` | Database operations | `POCKETBASE_*` env vars |
-| `coolify` | Deployment management | `COOLIFY_*` env vars |
-| `github` | Repo management | `GITHUB_*` env vars |
-| `context7` | Documentation lookup | None needed |
-| `fetch` | HTTP/API testing | None needed |
-| `memory` | Persistent context | None needed |
-| `docker` | Container management | None needed |
+## MCP Servers
 
-### Custom Commands
+| MCP Server | Purpose |
+|------------|---------|
+| `pocketbase` | Database operations |
+| `context7` | Documentation lookup |
+| `github` | Repo management |
+| `fetch` | HTTP/API testing |
 
-Available slash commands (in `.claude/commands/`):
+## Custom Commands
 
-- `/dev` - Start local development environment
-- `/stop` - Stop all local servers
-- `/db-status` - Check PocketBase health and collections
-- `/setup` - Initial project configuration guide
-- `/deploy` - Manual deployment instructions
-- `/commit` - Create a commit with consistent message format
-- `/migrate` - Guide for migrating existing projects
+| Command | Description |
+|---------|-------------|
+| `/dev` | Start local development environment |
+| `/stop` | Stop all local servers |
+| `/db-status` | Check PocketBase health and collections |
+| `/setup` | Initial project configuration guide |
+| `/deploy` | Manual deployment instructions |
+| `/commit` | Create a commit with consistent message format |
+| `/migrate` | Guide for migrating existing projects |
 
-### Commit Message Convention
-
-All projects use this format:
+## Commit Convention
 
 ```
 <type>(<scope>): <subject>
@@ -151,139 +111,72 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 
 Types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`, `ci`
 
-See `/commit` command for full details.
-
-### Permissions
-
-Pre-configured permissions in `.claude/settings.json`:
-- Docker compose operations
-- npm and node commands
-- Git operations
-- curl for testing
-
-## Local Development
-
-### Quick Start
-
-```bash
-docker compose up --build
-```
-
-### Available Services
-
-| Service | URL |
-|---------|-----|
-| Homepage | http://localhost:3000 |
-| Web App | http://localhost:3001 |
-| Admin Dashboard | http://localhost:3002 |
-| PocketBase API | http://localhost:8090/api/ |
-| PocketBase Admin | http://localhost:8090/_/ |
-
-### Hot Reload
-
-- **Static files:** Changes to `homepage/`, `webapp/`, `admin/` are immediate
-- **Server code:** Changes to `server/*.js` auto-restart via Node.js `--watch`
-- **PocketBase hooks:** Changes to `api/pb_hooks/` require container restart
-
-## Deployment
-
-Deploy anywhere Docker runs: VPS, Coolify, Railway, Render, Fly.io, DigitalOcean, etc.
-
-### Build & Deploy
-
-```bash
-# Build production image
-docker build -t myapp .
-
-# Run (any Docker host)
-docker run -d --restart unless-stopped \
-  -p 3000:3000 -p 3001:3001 -p 3002:3002 -p 8090:8090 \
-  -v pb_data:/app/api/pb_data \
-  myapp
-```
-
-### PaaS Platforms (Coolify, Railway, Render, Fly.io)
-
-1. Connect your GitHub repository
-2. Point to the root `Dockerfile`
-3. Configure domains for each port
-4. Set environment variables
-
-### Environment Variables (Production)
-
-- `NODE_ENV=production`
-- `API_URL=https://api.yourdomain.com`
-- `HOMEPAGE_PORT=3000`
-- `WEBAPP_PORT=3001` (or empty for path-based)
-- `ADMIN_PORT=3002` (or empty for path-based)
-
-### Auto-Deploy
-
-Push to `main` branch triggers GitHub Actions to build and test.
-
-**Note:** Always deploy using Dockerfile (not Nixpacks). Only Dockerfile deployments support rolling updates with zero downtime.
-
-## Admin Dashboard
-
-The admin dashboard provides operational insights:
-
-| Feature | Description |
-|---------|-------------|
-| System Health | CPU, memory, uptime of container |
-| Service Status | Health of all servers |
-| Request Logs | Recent HTTP requests |
-| PocketBase Stats | Database size, health status |
-
-**Authentication:** Requires PocketBase admin credentials.
-
 ## PocketBase Notes
-
-### Hooks
-
-Custom hooks in `api/pb_hooks/main.pb.js`:
-- Custom routes
-- Database event handlers
-- Cron jobs
-
-**Note:** Hooks run in isolated contexts - variables declared outside handlers aren't accessible inside them.
-
-### Migrations
-
-Migrations stored in `api/pb_migrations/`. Export from admin UI or create manually.
 
 ### Reserved System Routes
 
-**NEVER overwrite these routes with custom hooks** - they are used by PocketBase internally:
+**NEVER overwrite these routes with custom hooks:**
 
 | Route | Purpose |
 |-------|---------|
 | `/_/*` | Admin dashboard UI |
 | `/api/health` | Health check endpoint |
-| `/api/settings` | Application settings |
-| `/api/backups/*` | Backup management |
 | `/api/collections/*` | Collection schema CRUD |
 | `/api/collections/{c}/records/*` | Record CRUD operations |
-| `/api/collections/{c}/auth-methods` | List auth methods |
-| `/api/collections/{c}/auth-with-password` | Password authentication |
-| `/api/collections/{c}/auth-with-oauth2` | OAuth2 authentication |
-| `/api/collections/{c}/auth-with-otp` | OTP authentication |
-| `/api/collections/{c}/auth-refresh` | Refresh auth token |
-| `/api/collections/{c}/request-verification` | Request email verification |
-| `/api/collections/{c}/confirm-verification` | Confirm email verification |
-| `/api/collections/{c}/request-password-reset` | Request password reset |
-| `/api/collections/{c}/confirm-password-reset` | Confirm password reset |
-| `/api/collections/{c}/request-email-change` | Request email change |
-| `/api/collections/{c}/confirm-email-change` | Confirm email change |
-| `/api/collections/{c}/impersonate` | Impersonate user (superuser) |
+| `/api/collections/{c}/auth-*` | Authentication endpoints |
 | `/api/files/*` | File serving |
-| `/api/realtime` | SSE realtime subscriptions |
-| `/api/batch` | Batch API requests |
+| `/api/realtime` | SSE subscriptions |
+| `/api/batch` | Batch requests |
 
-**Safe pattern for custom routes:** Use `/api/custom/` or `/api/myapp/` prefix.
+**Safe pattern:** Use `/api/custom/` or `/api/myapp/` prefix for custom routes.
+
+### Hooks Runtime (GOJA)
+
+Hooks run in **GOJA** (Go-based JS interpreter), not Node.js.
+
+**PocketBase globals:**
+
+| Global | Purpose |
+|--------|---------|
+| `$app` | PocketBase application instance |
+| `$http` | HTTP client (`$http.send()`) |
+| `$os` | OS operations, env vars, shell commands |
+| `$security` | JWT, encryption, random strings |
+| `$mails` | Email sending |
+| `$filesystem` | File operations |
+| `$filepath` | Path utilities |
+| `$dbx` | Database query builder |
+| `$apis` | API routing helpers |
+| `$template` | Template rendering |
+
+**Also available:**
+- `require()` for local CommonJS modules (not npm)
+- `cronAdd()` / `cronRemove()` for scheduled tasks
+- `routerAdd()` / `routerUse()` for custom routes
+- `sleep()` for delays
+- 100+ hook functions (`onRecordCreate`, `onMailerSend`, etc.)
+
+**NOT available:**
+- npm packages
+- `fetch()` - use `$http.send()` instead
+- `async`/`await`, `Promise` - everything is synchronous
+- Node.js APIs (`fs`, `buffer`, `crypto`)
+- Browser APIs (`window`, `document`)
+
+**Full reference:** https://pocketbase.io/jsvm/index.html
+
+## Hot Reload
+
+- **Static files:** Changes to `homepage/`, `webapp/`, `admin/` are immediate
+- **Server code:** Changes to `server/*.js` auto-restart via Node.js `--watch`
+- **PocketBase hooks:** Changes to `api/pb_hooks/` require container restart
+
+## Coding Guidelines
+
+- Only use PocketBase Authentication. Don't implement auth yourself.
+- Update this file when making significant changes to structure or architecture.
 
 ## Notes
-
-Only use PocketBase Authentication. Don't implement Auth yourself.
 
 [Add any project-specific notes, decisions, or gotchas here]
 

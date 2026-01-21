@@ -10,14 +10,6 @@
         "POCKETBASE_ADMIN_PASSWORD": "${POCKETBASE_ADMIN_PASSWORD}"
       }
     },
-    "coolify": {
-      "command": "npx",
-      "args": ["-y", "@coolify/mcp"],
-      "env": {
-        "COOLIFY_URL": "${COOLIFY_URL}",
-        "COOLIFY_TOKEN": "${COOLIFY_TOKEN}"
-      }
-    },
     "context7": {
       "command": "npx",
       "args": ["-y", "@context7/mcp"]
@@ -32,14 +24,6 @@
     "fetch": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-fetch"]
-    },
-    "memory": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-memory"]
-    },
-    "docker": {
-      "command": "npx",
-      "args": ["-y", "mcp-server-docker"]
     }
   }
 }

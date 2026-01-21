@@ -116,11 +116,17 @@ async function loadSystem() {
     try {
         const data = await adminApi.getSystem();
 
-        document.getElementById('cpu-usage').textContent = `${data.cpu.usage}%`;
+        // App memory with host percentage
         document.getElementById('memory-usage').textContent =
-            `${data.memory.usagePercent}% (${formatBytes(data.memory.used)} / ${formatBytes(data.memory.total)})`;
+            `${formatBytes(data.memory.app)} (${data.memory.hostPercent}% of host)`;
+
+        // Node.js heap usage
+        const heapPercent = Math.round((data.memory.node.heapUsed / data.memory.node.heapTotal) * 100);
+        document.getElementById('heap-usage').textContent =
+            `${heapPercent}% (${formatBytes(data.memory.node.heapUsed)} / ${formatBytes(data.memory.node.heapTotal)})`;
+
         document.getElementById('uptime').textContent = formatUptime(data.uptime);
-        document.getElementById('load-avg').textContent = data.loadAverage.map(l => l.toFixed(2)).join(' ');
+        document.getElementById('cpu-cores').textContent = data.cpu.cores;
     } catch (error) {
         console.error('Failed to load system metrics:', error);
     }

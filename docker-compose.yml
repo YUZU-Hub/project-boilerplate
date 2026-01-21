@@ -2,12 +2,14 @@ services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
+      args:
+        - NODE_ENV=${NODE_ENV:-development}
     ports:
-      - "3000:3000"   # Homepage
-      - "3001:3001"   # Webapp
-      - "3002:3002"   # Admin
-      - "8090:8090"   # PocketBase
+      - "${HOMEPAGE_PORT:-3000}:${HOMEPAGE_PORT:-3000}"
+      - "${WEBAPP_PORT:-3001}:${WEBAPP_PORT:-3001}"
+      - "${ADMIN_PORT:-3002}:${ADMIN_PORT:-3002}"
+      - "8090:8090"
     volumes:
       # Static files (hot-reload)
       - ./homepage:/app/homepage
@@ -23,14 +25,16 @@ services:
       # Persistent data
       - pb_data:/pb/pb_data
     environment:
-      - NODE_ENV=development
-      - HOMEPAGE_PORT=3000
-      - WEBAPP_PORT=3001
-      - ADMIN_PORT=3002
-      - API_URL=http://localhost:8090
+      - NODE_ENV=${NODE_ENV:-development}
+      - HOMEPAGE_PORT=${HOMEPAGE_PORT:-3000}
+      - WEBAPP_PORT=${WEBAPP_PORT:-3001}
+      - WEBAPP_PATH=${WEBAPP_PATH:-/}
+      - ADMIN_PORT=${ADMIN_PORT:-3002}
+      - ADMIN_PATH=${ADMIN_PATH:-/admin}
+      - API_URL=${API_URL:-http://localhost:8090}
     restart: unless-stopped
     healthcheck:
-      test: wget -q --spider http://localhost:3000/health && wget -q --spider http://localhost:8090/api/health || exit 1
+      test: wget -q --spider http://localhost:${HOMEPAGE_PORT:-3000}/health && wget -q --spider http://localhost:8090/api/health || exit 1
       interval: 30s
       timeout: 5s
       retries: 3

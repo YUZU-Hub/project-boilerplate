@@ -192,15 +192,15 @@
         <section id="quickstart" class="quickstart">
             <div class="section-header">
                 <h2>Quick Start</h2>
-                <p>Get running in under a minute</p>
+                <p>From zero to working app in minutes</p>
             </div>
             <div class="steps">
                 <div class="step">
                     <div class="step-number">1</div>
                     <div class="step-content">
-                        <h4>Clone the repository</h4>
+                        <h4>Run the installer</h4>
                         <div class="code-block">
-                            <code>git clone https://github.com/your-org/project-boilerplate.git my-project</code>
+                            <code>curl -fsSL https://raw.githubusercontent.com/your-org/boilerplate/main/install.sh | sh -s my-project</code>
                             <button class="copy-btn" onclick="copyCode(this)">Copy</button>
                         </div>
                     </div>
@@ -208,9 +208,9 @@
                 <div class="step">
                     <div class="step-number">2</div>
                     <div class="step-content">
-                        <h4>Start development server</h4>
+                        <h4>Describe what you want to build</h4>
                         <div class="code-block">
-                            <code>cd my-project && docker compose up --build</code>
+                            <code>claude "Build a todo list with user auth and sharing"</code>
                             <button class="copy-btn" onclick="copyCode(this)">Copy</button>
                         </div>
                     </div>
@@ -218,7 +218,7 @@
                 <div class="step">
                     <div class="step-number">3</div>
                     <div class="step-content">
-                        <h4>Open in browser</h4>
+                        <h4>Your app is ready</h4>
                         <div class="step-links">
                             <a href="http://localhost:3000" target="_blank">localhost:3000</a> - Homepage
                             <a href="http://localhost:3001" target="_blank">localhost:3001</a> - Webapp
@@ -252,19 +252,15 @@ project/
 │   ├── css/
 │   ├── js/
 │   └── index.html
-├── server/            <span class="comment"># Node.js Express servers</span>
-│   ├── homepage.js
-│   ├── webapp.js
-│   ├── admin.js
-│   └── index.js
+├── server/            <span class="comment"># Node.js Express server</span>
+│   └── index.js       <span class="comment"># Single unified server</span>
 ├── api/               <span class="comment"># PocketBase (port 8090)</span>
 │   ├── pb_hooks/      <span class="comment"># Custom hooks</span>
-│   ├── pb_migrations/ <span class="comment"># Schema migrations</span>
-│   └── pb_data/       <span class="comment"># Database (gitignored)</span>
-├── Dockerfile         <span class="comment"># Production build</span>
-├── Dockerfile.dev     <span class="comment"># Development build</span>
+│   └── pb_migrations/ <span class="comment"># Schema migrations</span>
+├── .claude/           <span class="comment"># Claude Code config</span>
+├── Dockerfile         <span class="comment"># Unified container</span>
 ├── docker-compose.yml <span class="comment"># Local development</span>
-└── entrypoint.sh      <span class="comment"># Process manager</span>
+└── CLAUDE.md          <span class="comment"># AI instructions</span>
 </pre>
                 </div>
                 <div class="structure-notes">

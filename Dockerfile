@@ -1,5 +1,8 @@
-# Production Dockerfile
+# Unified Dockerfile
 # Single container with Node.js (Express) and PocketBase
+# Supports both development and production modes via NODE_ENV build arg
+
+ARG NODE_ENV=production
 
 # =============================================================================
 # Stage 1: Download PocketBase
@@ -21,16 +24,24 @@ RUN wget -q "https://github.com/pocketbase/pocketbase/releases/download/v${POCKE
 # =============================================================================
 FROM node:20-alpine AS node-builder
 
+ARG NODE_ENV=production
+
 WORKDIR /app/server
 
 # Copy package files and install dependencies
 COPY server/package*.json ./
-RUN npm ci --only=production
+RUN if [ "$NODE_ENV" = "production" ]; then \
+        npm ci --only=production; \
+    else \
+        npm install; \
+    fi
 
 # =============================================================================
-# Stage 3: Production image
+# Stage 3: Final image
 # =============================================================================
 FROM node:20-alpine
+
+ARG NODE_ENV=production
 
 # Install wget for health checks
 RUN apk add --no-cache wget
@@ -57,12 +68,12 @@ COPY admin/ /app/admin/
 COPY api/pb_hooks/ /pb/pb_hooks/
 COPY api/pb_migrations/ /pb/pb_migrations/
 
-# Copy entrypoint
+# Copy unified entrypoint
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 # Environment defaults
-ENV NODE_ENV=production
+ENV NODE_ENV=${NODE_ENV}
 ENV HOMEPAGE_PORT=3000
 ENV WEBAPP_PORT=3001
 ENV ADMIN_PORT=3002
@@ -72,7 +83,7 @@ ENV API_URL=http://localhost:8090
 EXPOSE 3000 3001 3002 8090
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
     CMD wget -q --spider http://localhost:3000/health && \
         wget -q --spider http://localhost:8090/api/health || exit 1
 
