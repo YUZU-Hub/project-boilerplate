@@ -83,19 +83,25 @@ else
     echo "All services started:"
 fi
 echo ""
-echo "  Homepage:    http://localhost:${HOMEPAGE_PORT:-3000}"
+# Use HOST_*_PORT for display (external/host ports), fall back to internal ports
+DISPLAY_HOMEPAGE=${HOST_HOMEPAGE_PORT:-${HOMEPAGE_PORT:-3000}}
+DISPLAY_WEBAPP=${HOST_WEBAPP_PORT:-${WEBAPP_PORT:-3001}}
+DISPLAY_ADMIN=${HOST_ADMIN_PORT:-${ADMIN_PORT:-3002}}
+DISPLAY_PB=${HOST_POCKETBASE_PORT:-${POCKETBASE_PORT:-8090}}
+
+echo "  Homepage:    http://localhost:${DISPLAY_HOMEPAGE}"
 if [ -n "${WEBAPP_PORT}" ]; then
-    echo "  Webapp:      http://localhost:${WEBAPP_PORT}"
+    echo "  Webapp:      http://localhost:${DISPLAY_WEBAPP}"
 else
-    echo "  Webapp:      http://localhost:${HOMEPAGE_PORT:-3000}${WEBAPP_PATH:-/}"
+    echo "  Webapp:      http://localhost:${DISPLAY_HOMEPAGE}${WEBAPP_PATH:-/}"
 fi
 if [ -n "${ADMIN_PORT}" ]; then
-    echo "  Admin:       http://localhost:${ADMIN_PORT}"
+    echo "  Admin:       http://localhost:${DISPLAY_ADMIN}"
 else
-    echo "  Admin:       http://localhost:${HOMEPAGE_PORT:-3000}${ADMIN_PATH:-/admin}"
+    echo "  Admin:       http://localhost:${DISPLAY_HOMEPAGE}${ADMIN_PATH:-/admin}"
 fi
-echo "  PocketBase:  http://localhost:${POCKETBASE_PORT:-8090}"
-echo "  PB Admin:    http://localhost:${POCKETBASE_PORT:-8090}/_/"
+echo "  PocketBase:  http://localhost:${DISPLAY_PB}"
+echo "  PB Admin:    http://localhost:${DISPLAY_PB}/_/"
 echo ""
 
 if [ "$IS_DEV" = true ]; then
