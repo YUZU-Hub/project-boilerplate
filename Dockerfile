@@ -9,7 +9,7 @@ ARG NODE_ENV=production
 # =============================================================================
 FROM alpine:3.19 AS pocketbase-downloader
 
-ARG POCKETBASE_VERSION=0.25.0
+ARG POCKETBASE_VERSION=0.36.5
 ARG TARGETARCH
 
 RUN apk add --no-cache wget unzip

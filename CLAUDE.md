@@ -51,7 +51,23 @@ claude "Create a todos collection with title, completed, and user fields"
 
 ## Development Workflow
 
-**When building features:**
+### First Session: Check for Dependency Updates
+
+**Before writing any code in a new project**, check that all pinned dependencies are up to date. The boilerplate pins specific versions that may be outdated by the time the project is cloned:
+
+| Dependency | Where it's pinned | How to check latest |
+|------------|--------------------|---------------------|
+| PocketBase | `Dockerfile` → `POCKETBASE_VERSION` | `gh api repos/pocketbase/pocketbase/releases/latest --jq '.tag_name'` |
+| PocketBase JS SDK | `webapp/index.html`, `admin/index.html` → CDN `<script>` tags | `gh api repos/pocketbase/js-sdk/releases/latest --jq '.tag_name'` |
+| Node.js | `Dockerfile` → base image `node:XX-alpine` | Check [Node.js releases](https://nodejs.org) |
+
+**Update process:**
+1. Check latest versions using the commands above
+2. Review changelogs for breaking changes (PocketBase moves fast)
+3. Update the pinned versions
+4. Rebuild: `docker compose up --build -d`
+
+### When building features:
 1. Create PocketBase collections via MCP (requires docker running)
 2. Add frontend code to `webapp/` (hot-reloads)
 3. Add hooks to `api/pb_hooks/` if needed (requires restart)
@@ -71,27 +87,23 @@ claude "Create a todos collection with title, completed, and user fields"
 
 ## Documentation Lookup
 
-**CRITICAL:** Before writing ANY PocketBase code, ALWAYS:
-1. Check the current stable version via Context7
-2. Verify the correct syntax for that version
-3. PocketBase APIs change between versions - don't assume
+**CRITICAL:** PocketBase evolves rapidly. Before writing ANY PocketBase code, ALWAYS:
+1. Use Context7 to fetch the latest docs — never rely on memorized APIs
+2. Verify the syntax matches the version pinned in this project (`Dockerfile` and CDN tags)
+3. If the pinned version is outdated, flag it to the user and offer to update (see "First Session" above)
 
-```
-"What is the current stable PocketBase JS SDK version and authentication syntax?"
-"Show me the current PocketBase realtime subscription syntax"
-```
-
-**Key docs to check:**
+**Key docs to check via Context7:**
 - PocketBase JS SDK (frontend): authentication, CRUD, realtime, files
-- PocketBase Hooks (backend): `$app`, `$http`, event handlers
+- PocketBase JSVM (backend hooks): `$app`, `$http`, event handlers
 - Express.js: routes, middleware (for Node.js server)
 
-**CDN links:** Always verify CDN URLs exist before adding them. Check the actual CDN (jsdelivr, unpkg, cdnjs) for the correct version and path. Don't guess URLs - they change between versions.
+**CDN links:** Always verify CDN URLs exist before adding them (`curl -sI <url>`). Don't guess URLs — they change between versions.
 
-**Updating PocketBase:** Version is set in `Dockerfile` (`POCKETBASE_VERSION`). Before updating:
+**Updating PocketBase:** Version is set in `Dockerfile` (`POCKETBASE_VERSION`). JS SDK version is in CDN `<script>` tags. Before updating:
 1. Check changelog for breaking changes
 2. Review existing hooks/migrations for incompatibilities
-3. Test locally before deploying
+3. Verify CDN URL returns HTTP 200
+4. Rebuild container and test locally
 
 ## MCP Servers
 
