@@ -19,6 +19,7 @@
 ├── api/              → PocketBase configuration
 │   ├── pb_hooks/     → Custom PocketBase hooks
 │   └── pb_migrations/→ Database migrations
+├── specs/            → BDD specs in Given/When/Then format (written BEFORE code)
 ├── server/
 │   └── index.js      → Single unified Express server (all 3 apps)
 ├── Dockerfile        → Unified container (dev + prod)
@@ -67,11 +68,45 @@ claude "Create a todos collection with title, completed, and user fields"
 3. Update the pinned versions
 4. Rebuild: `docker compose up --build -d`
 
-### When building features:
-1. Create PocketBase collections via MCP (requires docker running)
-2. Add frontend code to `webapp/` (hot-reloads)
-3. Add hooks to `api/pb_hooks/` if needed (requires restart)
-4. Test at http://localhost:3001
+### Building Features: Specs First
+
+**Always write BDD-style specs before writing implementation code.** This applies to every feature, bug fix, or refactoring task. The workflow is:
+
+1. **Spec** — Write human-readable behavioral specs describing what the feature should do, covering happy paths, edge cases, and error states. Place specs in a `specs/` directory using plain-language `.md` files organized by feature:
+   ```
+   specs/
+   ├── auth/
+   │   ├── login.md
+   │   └── registration.md
+   └── todos/
+       ├── create-todo.md
+       └── complete-todo.md
+   ```
+   Each spec file describes scenarios in Given/When/Then format:
+   ```markdown
+   ## Create a todo
+   - Given a logged-in user
+   - When they submit a new todo with a title
+   - Then the todo appears in their list
+   - And other users cannot see it
+
+   ## Reject empty titles
+   - Given a logged-in user
+   - When they submit a todo with no title
+   - Then they see a validation error
+   - And no todo is created
+   ```
+
+2. **Implement** — Write the minimal code to satisfy the specs:
+   - Create PocketBase collections via MCP (requires docker running)
+   - Add frontend code to `webapp/` (hot-reloads)
+   - Add hooks to `api/pb_hooks/` if needed (requires restart)
+
+3. **Verify** — Manually confirm each scenario passes at http://localhost:3001. Update specs with any discovered edge cases.
+
+4. **Iterate** — If requirements change, update the specs first, then the code.
+
+**Why specs first?** Specs force clarity on what "done" looks like before writing code. They prevent scope creep, catch missing edge cases early, and serve as living documentation. When Claude builds features, specs keep the implementation focused and verifiable.
 
 **Important:** Docker must be running before using PocketBase MCP to create collections.
 
