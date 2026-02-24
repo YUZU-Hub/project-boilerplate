@@ -63,6 +63,15 @@ done
 
 echo "PocketBase is ready!"
 
+# Create superuser from env vars if set (for automated deployments like Coolify).
+# NOTE: CLAUDE.md says "NEVER run pocketbase superuser commands" — that rule applies to
+# Claude (the AI assistant), not to this entrypoint. This block is for headless deployment
+# platforms where the admin UI isn't available during setup.
+if [ -n "$PB_ADMIN_EMAIL" ] && [ -n "$PB_ADMIN_PASSWORD" ]; then
+    echo "Creating/updating PocketBase superuser..."
+    /pb/pocketbase superuser upsert "$PB_ADMIN_EMAIL" "$PB_ADMIN_PASSWORD" --dir=/pb/pb_data 2>&1 || echo "WARNING: Failed to create superuser"
+fi
+
 # Start Node.js servers (with --watch in development mode)
 if [ "$IS_DEV" = true ]; then
     echo "Starting Node.js servers (watch mode for hot-reload)..."

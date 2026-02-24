@@ -72,15 +72,15 @@ COPY api/pb_migrations/ /pb/pb_migrations/
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-# Environment defaults
+# Environment defaults (production: single port, path-based routing)
 ENV NODE_ENV=${NODE_ENV}
 ENV HOMEPAGE_PORT=3000
-ENV WEBAPP_PORT=3001
-ENV ADMIN_PORT=3002
+ENV WEBAPP_PATH=/app
+ENV ADMIN_PATH=/admin
 ENV API_URL=http://localhost:8090
 
 # Expose ports
-EXPOSE 3000 3001 3002 8090
+EXPOSE 3000 8090
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \

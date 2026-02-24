@@ -102,11 +102,38 @@ claude "Create a todos collection with title, completed, and user fields"
    - Add frontend code to `webapp/` (hot-reloads)
    - Add hooks to `api/pb_hooks/` if needed (requires restart)
 
-3. **Verify** — Manually confirm each scenario passes at http://localhost:3001. Update specs with any discovered edge cases.
+3. **Security Review** — Before considering a feature complete, audit the new code against the OWASP Top 10. Check every item below that applies:
 
-4. **Iterate** — If requirements change, update the specs first, then the code.
+   | Check | What to look for |
+   |-------|-----------------|
+   | **Injection** | Are all PocketBase filters using `api.filter()` with parameters? Any raw SQL, `eval()`, or `new Function()`? |
+   | **Broken Auth** | Does the feature respect PocketBase auth rules? Are API rules set on the collection (list/view/create/update/delete)? Can users access other users' data? |
+   | **Sensitive Data** | Are secrets in `.env` only (never hardcoded)? Is sensitive data excluded from API responses? Are passwords/tokens ever logged? |
+   | **XSS** | Is all user-generated content escaped before rendering? Does any code use `innerHTML`, `document.write`, or `dangerouslySetInnerHTML` without sanitization? |
+   | **Broken Access Control** | Do collection rules enforce ownership (e.g., `@request.auth.id = user.id`)? Can unauthenticated users reach protected routes? |
+   | **Security Misconfiguration** | Are CORS settings appropriate? Is debug info hidden in production? Are default credentials removed? |
+   | **Insecure Dependencies** | Are CDN URLs pinned to specific versions? Run `npm audit` in `server/` if new dependencies were added. |
 
-**Why specs first?** Specs force clarity on what "done" looks like before writing code. They prevent scope creep, catch missing edge cases early, and serve as living documentation. When Claude builds features, specs keep the implementation focused and verifiable.
+   **Vibe coding pitfalls** — AI-generated code has specific failure modes. Also check:
+
+   | Check | What to look for |
+   |-------|-----------------|
+   | **Hallucinated packages** | Does every `<script src="...">` CDN URL and every `require()`/`import` reference a real package? Verify with `curl -sI <url>` for CDN or check npmjs.com. Fake package names are a supply chain attack vector. |
+   | **Overly permissive rules to "make it work"** | Did API rules get set to `""` (public) just to stop errors? Every collection rule should be intentional, not a workaround. |
+   | **Phantom validation** | Does the code _look_ like it validates input but actually doesn't? Check that validation logic runs server-side (PocketBase rules/hooks), not just client-side JS that can be bypassed. |
+   | **Debug/dev leftovers** | Are there `console.log` statements that dump tokens, passwords, or user data? Any test endpoints or commented-out auth checks left behind? |
+   | **Slop accumulation** | Was more code generated than needed? Dead code, unused functions, redundant abstractions, and unnecessary files all increase attack surface. Delete what's not used. |
+   | **Auth theater** | Does the UI _hide_ buttons/pages from unauthorized users but the underlying API is still wide open? Client-side route guards are UX, not security — the real enforcement is PocketBase collection rules. |
+   | **Secrets in generated code** | AI sometimes inlines example tokens, API keys, or placeholder credentials that look fake but get committed. Search for hardcoded strings that look like `sk-`, `pk_`, `Bearer`, base64 blobs, etc. |
+   | **Error messages that leak info** | Do error responses include stack traces, file paths, SQL errors, or internal IPs? In production, errors should be generic. |
+
+   If any check fails, fix it before moving on. Document security decisions in the spec file under a `## Security` section.
+
+4. **Verify** — Manually confirm each scenario passes at http://localhost:3001. Update specs with any discovered edge cases.
+
+5. **Iterate** — If requirements change, update the specs first, then the code.
+
+**Why this workflow?** Specs force clarity on what "done" looks like before writing code. Security review catches vulnerabilities before they ship. Together they prevent scope creep, catch edge cases early, and serve as living documentation.
 
 **Important:** Docker must be running before using PocketBase MCP to create collections.
 
@@ -318,6 +345,9 @@ This example works with a "todos" collection. **Delete the example sections** (m
 - **NEVER create PocketBase superuser/admin accounts.** If you see "create superuser" in logs, tell the user: "PocketBase needs an admin account. Please create one at http://localhost:8090/_/ or re-run the install script." Do NOT run `pocketbase superuser` yourself.
 - **Design fresh for each project.** The boilerplate's auth UI and example code are starting points, not templates to copy. Think about what design, layout, and UX patterns best fit the specific project being built.
 - Only use PocketBase Authentication. Don't implement auth yourself.
+- **Every new collection needs API rules.** Never leave list/view/create/update/delete rules empty (which defaults to superuser-only) or set to `""` (which means public access). Always set explicit rules like `@request.auth.id != ""` or `@request.auth.id = user.id`.
+- **Escape all user content before rendering.** Use the `escapeHtml()` helper in `webapp/js/app.js`. Never use `innerHTML` with unescaped user data.
+- **Never hardcode secrets.** Tokens, passwords, API keys go in `.env` only. Check that `.env` is in `.gitignore`.
 - Update this file when making significant changes to structure or architecture.
 
 ## Notes

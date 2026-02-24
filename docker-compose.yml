@@ -27,12 +27,10 @@ services:
       - pb_data:/pb/pb_data
     environment:
       - NODE_ENV=${NODE_ENV:-development}
-      # Internal ports are fixed (matching Dockerfile defaults and port mappings)
       - HOMEPAGE_PORT=3000
+      # Dev: separate ports for webapp/admin (override Dockerfile defaults)
       - WEBAPP_PORT=3001
-      - WEBAPP_PATH=${WEBAPP_PATH:-/}
       - ADMIN_PORT=3002
-      - ADMIN_PATH=${ADMIN_PATH:-/admin}
       - API_URL=http://localhost:8090
       # Host ports for display in logs (so users see the correct URLs)
       - HOST_HOMEPAGE_PORT=${HOMEPAGE_PORT:-3000}

@@ -10,6 +10,7 @@
 const express = require('express');
 const path = require('path');
 const os = require('os');
+const http = require('http');
 const fs = require('fs');
 
 // =============================================================================
@@ -410,6 +411,25 @@ function createHomepageApp() {
 
   app.get('/health', (req, res) => {
     res.json({ status: 'ok', service: 'homepage', timestamp: new Date().toISOString() });
+  });
+
+  // Reverse proxy: /pb/* → PocketBase (before body parsing so streaming/SSE works)
+  app.all('/pb/*', (req, res) => {
+    const targetPath = req.originalUrl.replace(/^\/pb/, '');
+    const proxyReq = http.request({
+      hostname: 'localhost',
+      port: 8090,
+      path: targetPath,
+      method: req.method,
+      headers: { ...req.headers, host: 'localhost:8090' }
+    }, (proxyRes) => {
+      res.writeHead(proxyRes.statusCode, proxyRes.headers);
+      proxyRes.pipe(res);
+    });
+    proxyReq.on('error', () => {
+      if (!res.headersSent) res.status(502).json({ error: 'PocketBase unreachable' });
+    });
+    req.pipe(proxyReq);
   });
 
   // Mount webapp at path if WEBAPP_PORT is empty
